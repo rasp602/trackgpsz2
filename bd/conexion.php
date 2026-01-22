@@ -1,5 +1,5 @@
 <?php 
-$mysqli = new mysqli("localhost", "rasp60", "Rodrigo2410$", "trackgpszulia");
+$mysqli = new mysqli("localhost", "rasp602", "Rodrigo2410$", "trackgpszulia");
 if ($mysqli->connect_error)
 {
 	die ('ERROR: No se establecio la conexion.'.mysqli_connect_error());
