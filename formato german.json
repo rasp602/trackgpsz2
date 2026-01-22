@@ -1,0 +1,39 @@
+{
+	"grupo":[
+		{
+			"nombre":"Flota TEST",
+			"vehiculos":[
+				{
+					"idBus":"400",
+					"placaBus":"AAAAAA",
+					"imei":"864035050554873"
+				},	
+				{
+					"idBus":"100",
+					"placaBus":"XXXXXX",
+					"imei":"868166053879474"
+				},
+				{
+					"idBus":"110",
+					"placaBus":"YYYYYY",
+					"imei":"865205038631569"
+				},
+				{
+					"idBus":"105",
+					"placaBus":"ZZZZZZ",
+					"imei":"864895035000338"
+				}			
+			]
+		},
+		{
+			"nombre":"Auto de Carlos",
+			"vehiculos":[
+				{
+					"idBus":"1",
+					"placaBus":"JJJJJJ",
+					"imei":"864035050554855"
+				}			
+			]
+		}		
+	]			
+}
