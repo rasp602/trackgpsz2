@@ -580,7 +580,7 @@ public function ListarTarjetasPorFecha($fecha)
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 	
-public function ExisteTarjeta1($fechaSalida, $horaTarjeta,$idVariante)
+public function ExisteTarjeta($fechaSalida, $horaTarjeta,$idVariante)
 {
     $sql = "SELECT 1
             FROM tarjeta
