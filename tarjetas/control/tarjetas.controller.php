@@ -192,8 +192,8 @@ public function FiltrarPorFecha()
     exit;
 }
 
-prueba
 
+p
 
 }
 ?>
