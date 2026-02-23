@@ -111,9 +111,9 @@ if ($num_rows > 0) {
         
         // CORREGIDO: La lógica estaba invertida (0=Si, 1=No)
         if ($row['visible'] == 0) {
-            $visible = "No";  // Si visible=0 significa que NO es visible
+            $visible = "Si";  // Si visible=0 significa que NO es visible
         } elseif ($row['visible'] == 1) {
-            $visible = "Sí";  // Si visible=1 significa que SÍ es visible
+            $visible = "No";  // Si visible=1 significa que SÍ es visible
         } else {
             $visible = "No definido";
         }

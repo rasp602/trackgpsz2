@@ -10,19 +10,20 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
 
-<script>
-function subirimagen()
-{
-  self.name = 'opener';
-  remote = open('persona/vista/gestionimagen.php', 'remote', 'width=600,height=200,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,fullscreen=yes, status=yes');
-  remote.focus();
-  }
 
-</script>
+<?php
+include 'bd/config.php';
 
+
+?>
 
   <?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>   
-  <?php $cliente=$usuario->id_user;?>       
+  <?php session_start();
+
+if (isset($_SESSION['usuario'])) {
+    $usuario = $_SESSION['usuario'];
+    $cliente = $usuario->id_user;
+}?>       
 
   <?php if (isset($_GET["repetido"])) echo '<div class="alert alert-warning" role="alert">El Bus que intenta ingresar ya se encuentra registrado...</div>';?> 
 
@@ -43,7 +44,7 @@ function subirimagen()
                   <div class="form-group">
                     <input type="hidden" class="form-control" id="idControl" name="idControl" value="<?php echo $vte->idControl;?>">
                     <label for="exampleInputEmail1">Nombre control</label>
-                   <input type="text" class="form-control" id="nombreControl" name="nombreControl" value="<?php echo $vte->nombreControl;?>" maxlength="10" placeholder="Ingresa el nombre del control">
+                   <input type="text" class="form-control" id="nombreControl" name="nombreControl" value="<?php echo $vte->nombreControl;?>" maxlength="50" placeholder="Ingresa el nombre del control">
                   </div>
                   <div class="form-group">
                     <label for="exampleInputPassword1">Abreviación</label>
@@ -105,12 +106,19 @@ function subirimagen()
                     </select>
                   </div>  
                  <div class="form-group">
-                    <label for="exampleInputPassword1">Visible:</label>
-                    <select name="sentido" id="sentido" class="form-control">
-                         <option value="I">IDA</option>
-                         <option value="R">REGRESO</option>                       
+                    <label for="exampleInputPassword1">Sentido:</label>
+                     <select name="sentido" id="sentido" class="form-control  input-md">
+                      <?php
+                        $sql_sentido = "SELECT DISTINCT sentido FROM controles";
+                        $result_sentido = $conn->query($sql_sentido);
+
+                        while ($row = $result_sentido->fetch_assoc()) {
+                            $selected = ($row['sentido'] == $vte->sentido) ? 'selected' : '';
+                            echo "<option value='{$row['sentido']}' $selected>{$row['sentido']}</option>";
+                        }
+                      ?>
                     </select>
-                  </div>                                    
+                  </div>                                   
  
       <div id="mapa" style="height: 400px;"></div>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDV2KA_R534-_7ZGNn8MYKPzUHOAQiwlvI&callback=initMap"></script>
@@ -125,7 +133,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);</script>
 
                   <div class="form-group">             
-                    <button type="submit" class="btn btn-primary">Registrar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar</button>
                     <input type="button" id="cancelar" class="btn btn-danger" name="Cancelar" value="Cancelar" onClick="location.href='?c=menu_principal&a=menu_usuarios'">
                   </div>                 
                 </div>

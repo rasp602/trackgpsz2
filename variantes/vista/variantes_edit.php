@@ -10,19 +10,14 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
 
-<script>
-function subirimagen()
-{
-  self.name = 'opener';
-  remote = open('persona/vista/gestionimagen.php', 'remote', 'width=600,height=200,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,fullscreen=yes, status=yes');
-  remote.focus();
-  }
-
-</script>
-
 
   <?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>   
-  <?php $cliente=$usuario->id_user;?>       
+  <?php session_start();
+      if (isset($_SESSION['usuario'])) {
+          $usuario = $_SESSION['usuario'];
+          $cliente = $usuario->id_user;
+      }
+    ?>        
 
   <?php if (isset($_GET["repetido"])) echo '<div class="alert alert-warning" role="alert">El Bus que intenta ingresar ya se encuentra registrado...</div>';?> 
 

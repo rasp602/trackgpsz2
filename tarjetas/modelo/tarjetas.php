@@ -565,6 +565,7 @@ public function ListarTarjetasPorFecha($fecha)
                    b.placaBus,
                    b.numeroBus,
                    v.nombreVariante,
+                   v.sentido,
                    p.nombre1Persona,
                    p.apellido1Persona
             FROM tarjeta t

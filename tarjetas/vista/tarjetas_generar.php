@@ -234,6 +234,7 @@ document.getElementById("fechaSalida").addEventListener("change", function() {
                         <td>${t.placaBus}</td>
                         <td>${t.numeroBus}</td>
                         <td>${t.nombreVariante}</td>
+                        <td>${t.sentido}</td>
                         <td>${t.frecuenciaTarjeta}</td>
                         <td>${t.nombre1Persona} ${t.apellido1Persona}</td>
                         <td>

@@ -22,7 +22,12 @@ $result_proximaVariante = $conn->query($sql_proxima_variante);
 
 
   <?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>   
-  <?php $cliente=$usuario->id_user;?>       
+   <?php session_start();
+      if (isset($_SESSION['usuario'])) {
+          $usuario = $_SESSION['usuario'];
+          $cliente = $usuario->id_user;
+      }
+    ?>      
 
   <?php if (isset($_GET["repetido"])) echo '<div class="alert alert-warning" role="alert">El Bus que intenta ingresar ya se encuentra registrado...</div>';?> 
 

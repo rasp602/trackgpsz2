@@ -10,19 +10,15 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
 
-<script>
-function subirimagen()
-{
-  self.name = 'opener';
-  remote = open('persona/vista/gestionimagen.php', 'remote', 'width=600,height=200,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,fullscreen=yes, status=yes');
-  remote.focus();
-  }
-
-</script>
 
 
   <?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>   
-  <?php $cliente=$usuario->id_user;?>       
+  <?php session_start();
+      if (isset($_SESSION['usuario'])) {
+          $usuario = $_SESSION['usuario'];
+          $cliente = $usuario->id_user;
+      }
+    ?>       
 
   <?php if (isset($_GET["repetido"])) echo '<div class="alert alert-warning" role="alert">El Bus que intenta ingresar ya se encuentra registrado...</div>';?> 
 
@@ -43,7 +39,7 @@ function subirimagen()
                   <div class="form-group">
                     <input type="hidden" class="form-control" id="idControl" name="idControl" value="<?php echo $vte->idControl;?>">
                     <label for="exampleInputEmail1">Nombre control</label>
-                   <input type="text" class="form-control" id="nombreControl" name="nombreControl" value="<?php echo $vte->nombreControl;?>" maxlength="10" placeholder="Ingresa el nombre del control">
+                   <input type="text" class="form-control" id="nombreControl" name="nombreControl" value="<?php echo $vte->nombreControl;?>" maxlength="50" placeholder="Ingresa el nombre del control">
                   </div>
                   <div class="form-group">
                     <label for="exampleInputPassword1">Abreviación</label>
@@ -105,7 +101,7 @@ function subirimagen()
                     </select>
                   </div>  
                  <div class="form-group">
-                    <label for="exampleInputPassword1">Visible:</label>
+                    <label for="exampleInputPassword1">Sentido:</label>
                     <select name="sentido" id="sentido" class="form-control">
                          <option value="I">IDA</option>
                          <option value="R">REGRESO</option>                       
