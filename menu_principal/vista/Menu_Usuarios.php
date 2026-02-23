@@ -128,7 +128,7 @@ if (!isset($_SESSION['usuarioInventario']))
               <li class="nav-item">
                 <a href="?c=variantes&a=menuVariantes" class="nav-link">
 
-             <i class='glyphicon glyphicon-road' style='font-size:24px'></i>
+              <i class="fa fa-road" aria-hidden="true"></i>
                   <p>Variantes</p>
                 </a>
               </li> 
@@ -155,7 +155,7 @@ if (!isset($_SESSION['usuarioInventario']))
               <li class="nav-item">
                 <a href="?c=tarjetas&a=GenerarTarjetas" class="nav-link">
                  <i class='far fa-file-alt' style='font-size:24px'></i>
-                  <p>Tarjeta de salida</p>
+                  <p>Generar tarjeta</p>
                 </a>
               </li>  
              <li class="nav-item">
