@@ -36,12 +36,13 @@
                         <thead class="bg-primary" align="center">
                             <th class="sort asc h4">Numero</th>
                             <th class="sort asc h4">Nombre</th>
+                            <th class="sort asc h4">Sentido</th>
                             <th class="sort asc h4">Estado</th>
                             <th class="sort asc h4">FrecMAx</th>
                             <th class="sort asc h4">FrecMin</th>
                             <th class="sort asc h4">FrecNormal</th>
                             <th class="sort asc h4">Media</th>
-                            <th class="sort asc h4">Proxima</th>
+                            <th class="sort asc h4">Proxima Variante</th>
                             <th class="sort asc h4">Primera Salida</th>
                             <th class="sort asc h4">Color</th>
                             <th class="h4">Acciones</th>

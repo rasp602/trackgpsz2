@@ -9,7 +9,7 @@
 require '../../bd/config.php';
 
 /* Un arreglo de las columnas a mostrar en la tabla */
-$columns = ['idVariante','numeroVariante', 'nombreVariante', 'primeraSalida', 'estadoVariante', 'proximaVariante', 'mediaVuelta', 'colorVariante', 'frecNormal', 'frecMin', 'frecMax'];
+$columns = ['idVariante','numeroVariante', 'nombreVariante','sentido', 'primeraSalida', 'estadoVariante', 'proximaVariante', 'mediaVuelta', 'colorVariante', 'frecNormal', 'frecMin', 'frecMax'];
 
 /* Nombre de la tabla */
 $table = "variante";
@@ -103,6 +103,7 @@ if ($num_rows > 0) {
      
         $output['data'] .= '<td>' . $row['numeroVariante'] . '</td>';
         $output['data'] .= '<td>' . $row['nombreVariante'] . '</td>';
+        $output['data'] .= '<td>' . $row['sentido'] . '</td>';
         $output['data'] .= '<td>' . $estadoVariante. '</td>';
         $output['data'] .= '<td>' . $row['frecMax'] . '</td>';
         $output['data'] .= '<td>' . $row['frecMin'] . '</td>';
@@ -112,10 +113,10 @@ if ($num_rows > 0) {
         $output['data'] .= '<td>' . $row['primeraSalida'] . '</td>';
         $output['data'] .= '<td>' . $row['colorVariante'] . '</td>';
 
-
-
-
-        $output['data'] .= '<td><a class="glyphicon glyphicon-edit" href="?c=variantes&a=Crud1&idVariante=' . $row['idVariante'] . '"></a>  <a class="glyphicon glyphicon-trash" href="?c=variantes&a=Eliminar&idVariante='. $row['idVariante'] . '" onclick="javascript:return confirm("¿Seguro de eliminar este registro?"");""></a>
+        $output['data'] .= '<td><a class="glyphicon glyphicon-edit" href="?c=variantes&a=Crud1&idVariante=' . $row['idVariante'] . '">Editar</a>  
+        <a class="glyphicon glyphicon-trash" href="?c=variantes&a=Eliminar&idVariante='. $row['idVariante'] . '" onclick="return confirm(\'¿Seguro que deseas eliminar este registro?\')">
+   Eliminar
+</a>
         </td>';
 
 

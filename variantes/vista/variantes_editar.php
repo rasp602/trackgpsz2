@@ -4,21 +4,21 @@
   $hora=date("H:i:s");
   echo $hora;*/
 ?>
+<?php
+include 'bd/config.php';
+
+$sql_sentido = "SELECT sentido FROM variante";
+$result_sentido = $conn->query($sql_sentido);
+
+$sql_proxima_variante = "SELECT idVariante, nombreVariante FROM variante";
+$result_proximaVariante = $conn->query($sql_proxima_variante);
+?>
+
 
 <!-- Include Date Range Picker -->
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
-
-<script>
-function subirimagen()
-{
-  self.name = 'opener';
-  remote = open('persona/vista/gestionimagen.php', 'remote', 'width=600,height=200,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,fullscreen=yes, status=yes');
-  remote.focus();
-  }
-
-</script>
 
 
   <?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>   
@@ -45,6 +45,17 @@ function subirimagen()
                     <label for="exampleInputEmail1">Nombre variante</label>
                    <input type="text" class="form-control" id="nombreVariante" name="nombreVariante" value="<?php echo $vte->nombreVariante;?>" maxlength="10" placeholder="Ingresa el nombre de la variante">
                   </div>
+                   <div class="form-group">
+                    <label for="exampleInputPassword1">Sentido:</label>
+                     <select name="sentido" id="sentido" class="form-control  input-md">
+                      <?php
+                      while ($row_sentido = $result_sentido->fetch_assoc()) {
+                          $selected = ($row_sentido['sentido'] == $vte->sentido) ? 'selected' : '';
+                          echo "<option value='" . $row_sentido['sentido'] . "' $selected>" . $row_sentido['sentido'] . "</option>";
+                      }
+                      ?>
+                    </select>
+                  </div> 
                   <div class="form-group">
                     <label for="exampleInputPassword1">Numero de variante</label>
                     <input type="text" class="form-control" id="numeroVariante" name="numeroVariante" value="<?php echo $vte->numeroVariante;?>"  placeholder="Ingresa numero de la variante" onkeypress="return numeros(event)">
@@ -73,14 +84,19 @@ function subirimagen()
                          <option value="SI">Si</option>                       
                     </select>
                   </div>  
+                                 
                   <div class="form-group">
-                    <label for="exampleInputPassword1">Proxima Variante</label>
-                       <select name="proximaVariante" id="proximaVariante" class="form-control  input-md">
-                        <?php  foreach ($this->model->ListarVariantes()as $a): ?>
-                        <option  <?php echo $a->idVariante == "" ? 'selected' : ''; ?> value="<?php echo "$a->idVariante" ;?>"><?php echo $a->nombreVariante;?></option>
-                                      <?php endforeach; ?>  
-                      </select>
-                  </div>  
+                     <label for="exampleInputPassword1">Proxima Variante</label>
+                     <select name="proximaVariante" id="proximaVariante" class="form-control  input-md">
+                      <?php
+                      while ($row_proximaVariante = $result_proximaVariante->fetch_assoc()) {
+                          $selected = ($row_proximaVariante['idVariante'] == $vte->proximaVariante) ? 'selected' : '';
+                          echo "<option value='" . $row_proximaVariante['idVariante'] . "' $selected>" . $row_proximaVariante['idVariante'] .'-'. $row_proximaVariante['nombreVariante'] . "</option>";
+                      }
+                      ?>
+                    </select>
+                  </div> 
+            
 
                   <div class="form-group">
                     <label for="exampleInputEmail1">Hora de Primera salida</label>
