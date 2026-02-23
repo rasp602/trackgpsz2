@@ -1,0 +1,41 @@
+.espacio{
+	margin-top: 95px;
+}
+
+.titulos{
+	color: black;
+}
+
+.contenidoTabla{
+
+  text-align: center;
+  
+
+}
+
+.contenidoResultado{
+
+  text-align: left;
+
+}
+
+.tituloTabla{
+	color:#2897D2;
+
+}
+
+.titulosMenu{
+	color: #AAB7B8;
+
+}
+
+.azul{
+	background-color: red;
+	color: #2897D2;
+}
+.ticket-estilo {
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    white-space: pre-line;
+}

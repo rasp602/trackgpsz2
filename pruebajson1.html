@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Consulta de Buses</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function fetchData() {
+            $.ajax({
+                url: 'pruebajson.php',
+                type: 'GET',
+                dataType: 'json',
+
+                success: function(response) {
+                    // Procesar los datos recibidos (response)
+                    // Ejemplo: Actualizar una tabla en HTML con los datos
+                    console.log(response);
+                },
+                complete: function() {
+                    setTimeout(fetchData, 1000); // Llamar a la función nuevamente después de 1 segundo
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            fetchData(); // Llamar a la función por primera vez
+        });
+    </script>
+</head>
+<body>
+    <!-- Contenido de la página, como una tabla para mostrar los datos -->
+</body>
+</html>
