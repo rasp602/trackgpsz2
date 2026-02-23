@@ -34,7 +34,7 @@
      <?php if (isset($_GET["update"])) echo '<div class="alert alert-warning" role="alert">Tarjeta actualizada correctamente..</div>'; ?>
 
 
-     <div class="container mt-4">
+     <div class="container-fluid">
      <div class="row">
         <!-- Formulario en el lado izquierdo -->
         <div class="col-md-4">
@@ -130,6 +130,7 @@
                             <th>Placa</th>
                             <th>Bus</th>
                             <th>Variante</th>
+                            <th>Sentido</th>
                             <th>Frecuencia</th>
                             <th>Conductor</th>
                             <th>Acciones</th>
@@ -144,7 +145,8 @@
                                <td><?php echo $tarjeta->horaTarjeta; ?></td>   
                                 <td><?php echo $tarjeta->placaBus; ?></td>
                                 <td><?php echo $tarjeta->numeroBus; ?></td>
-                                <td><?php echo $tarjeta->nombreVariante; ?></td>                               
+                                <td><?php echo $tarjeta->nombreVariante; ?></td> 
+                                <td><?php echo $tarjeta->sentido; ?></td>                               
                                 <td><?php echo $tarjeta->frecuenciaTarjeta; ?></td>
                                  <td><?php echo $tarjeta->nombre1Persona." ".$tarjeta->apellido1Persona; ?></td>
                                 <td>

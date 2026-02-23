@@ -62,7 +62,7 @@ class Tarjetas
 			$stm = $this->pdo->prepare("SELECT
 tarjeta.idTarjeta,tarjeta.fechaSalida,tarjeta.horaTarjeta,tarjeta.idBus,tarjeta.idVariante,tarjeta.idPersona,tarjeta.frecuenciaTarjeta,
 tarjeta.fechaGenerado,tarjeta.busDelantero,tarjeta.busTrasero,buses.idBus,buses.numeroBus,buses.placaBus,variante.idVariante,variante.numeroVariante,
-variante.nombreVariante,persona.idPersona,persona.nombre1Persona,persona.apellido1Persona
+variante.nombreVariante,variante.sentido,persona.idPersona,persona.nombre1Persona,persona.apellido1Persona
 FROM tarjeta
 INNER JOIN buses ON tarjeta.idBus = buses.idBus
 INNER JOIN variante ON tarjeta.idVariante = variante.idVariante
