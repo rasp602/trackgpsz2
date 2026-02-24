@@ -9,10 +9,25 @@
 require '../../bd/config.php';
 
 /* Un arreglo de las columnas a mostrar en la tabla */
-$columns = ['ruta.idRuta','ruta.idVariante', 'ruta.idControl', 'ruta.minutos', 'ruta.tolerancia', 'ruta.tipoDias', 'ruta.horaDesde', 'ruta.horaHasta', 'ruta.idTablaValores', 'control.idControl','control.nombreControl'];
-
+$columns = [
+    'r.idRuta',
+    'r.idVariante',
+    'r.posicion',
+    'r.idControl',
+    'r.minutos',
+    'r.tolerancia',
+    'r.tipoDias',
+    'r.horaDesde',
+    'r.horaHasta',
+    'r.idTablaValores',
+    'c.idControl',
+    'c.nombreControl',
+    'v.nombreVariante'
+];
 /* Nombre de la tabla */
-$table = "ruta";
+$table = "ruta r
+          INNER JOIN controles c ON r.idControl = c.idControl
+          INNER JOIN variante v ON r.idVariante = v.idVariante";
 
 $id = 'idRuta';
 
@@ -95,19 +110,27 @@ if ($num_rows > 0) {
 
 
         $output['data'] .= '<tr>';
-        $output['data'] .= '<td>' . $row['idRuta'] . '</td>';
+        
         $output['data'] .= '<td>' . $row['idVariante'] . '</td>';
+        $output['data'] .= '<td>' . $row['nombreVariante'] . '</td>';
+         $output['data'] .= '<td>' . $row['posicion'] . '</td>';
         $output['data'] .= '<td>' . $row['idControl'] . '</td>';
+         $output['data'] .= '<td>' . $row['nombreControl'] . '</td>';
         $output['data'] .= '<td>' . $row['minutos'] . '</td>';
         $output['data'] .= '<td>' . $row['tolerancia'] . '</td>';
         $output['data'] .= '<td>' . $row['tipoDias'] . '</td>';
         $output['data'] .= '<td>' . $row['horaDesde'] . '</td>';
         $output['data'] .= '<td>' . $row['horaHasta'] . '</td>';
         $output['data'] .= '<td>' . $row['idTablaValores'] . '</td>';
-
-
-
-        $output['data'] .= '<td><a class="glyphicon glyphicon-edit" href="?c=ruta&a=Crud1&idRuta=' . $row['idRuta'] . '"></a>  <a class="glyphicon glyphicon-trash" href="?c=rutas&a=Eliminar&idRuta='. $row['idRuta'] . '" onclick="javascript:return confirm("¿Seguro de eliminar este registro?"");""></a>
+        $output['data'] .= '<td>
+        <button class="btn btn-sm btn-primary" onclick="editarRuta(' . $row['idRuta'] . ')">
+            <i class="glyphicon glyphicon-edit"></i> Editar
+        </button>  
+        <a class="btn btn-sm btn-danger" 
+        href="?c=rutas&a=Eliminar&idRuta=' . $row['idRuta'] . '" 
+        onclick="return confirm(\'¿Seguro de eliminar este registro?\');">
+            <i class="glyphicon glyphicon-trash"></i>Eliminar
+        </a>
         </td>';
         $output['data'] .= '</tr>';
     }
