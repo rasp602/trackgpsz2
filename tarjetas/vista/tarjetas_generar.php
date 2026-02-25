@@ -53,7 +53,7 @@
                 <!-- Variante -->
         <div class="mb-3">
             <label for="idVariante" class="form-label"><strong>Variante</strong></label>
-            <select name="idVariante" id="idVariante" class="form-select" required>
+            <select name="idVariante" id="idVariante" class="form-control" required>
                 <option value="">Seleccionar Variante</option>
                 <?php foreach ($this->model->ListarVariante() as $a): ?>
                     <option value="<?php echo $a->idVariante; ?>" <?php echo $a->idVariante == "" ? 'selected' : ''; ?>>
@@ -77,7 +77,7 @@
         <!-- Bus -->
         <div class="mb-3">
             <label for="idBus" class="form-label"><strong>Bus</strong></label>
-            <select name="idBus" id="idBus" class="form-select" required>
+            <select name="idBus" id="idBus" class="form-control" required>
                 <option value="">Seleccionar Bus</option>
                 <?php foreach ($this->model->ListarBuses() as $a): ?>
                     <option value="<?php echo $a->idBus; ?>" <?php echo $a->idBus == "" ? 'selected' : ''; ?>>
