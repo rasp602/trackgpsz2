@@ -1,10 +1,5 @@
 <head>
-<div class="modal-header bg-primary text-white">
-    <h5 class="modal-title">Editar Ruta</h5>
-    <button type="button" class="close text-white" data-dismiss="modal">
-        <span>&times;</span>
-    </button>
-</div>
+
 </head>  
     <div class="container-fluid">
         <h2>Rutas</h2>
@@ -23,6 +18,22 @@
                     <p align="left">Buscar:</p>
                     <input type="text" name="campo" id="campo" class="form-control">
             </div>
+            <div class="col-md-2 h5">
+                <p align="center">Seleccionar Variante: <span id="select_variante"></span></p>
+                    <select class="form-control" id="idVariante" name="idVariante">
+                        <option value="">Seleccione una variante</option>
+                                <?php
+                                // Cargar variantes para el select
+                                require 'bd/config.php';
+                                $sql_variantes = "SELECT idVariante, nombreVariante FROM variante ORDER BY nombreVariante";
+                                $result_variantes = $conn->query($sql_variantes);
+                                while($row_var = $result_variantes->fetch_assoc()) {
+                                    echo '<option value="'.$row_var['idVariante'].'">'.$row_var['nombreVariante'].'</option>';
+                                }
+                                ?>
+                    </select>
+
+            </div>
             <div class="col-auto h5">
                 <a href="javascript:reportePDF1();"  data-toggle="tooltip" title="descargar buses"><img src="img/pdf.png" width="50px" height="50px"><p align="center">Descargar</p></a>
             </div> 
@@ -32,10 +43,11 @@
      
 
         <div class="col-auto h5">
-            <a href="?c=rutas&a=Crud"><i class='fas fa-user-tag' style='font-size:48px'></i>
-                 <p>Agregar Ruta</p></a>
+          <a href="#" data-toggle="modal" data-target="#modalRuta">
+                <i class='fas fa-user-tag' style='font-size:48px'></i>
+                <p>Agregar Ruta</p>
+         </a>
         </div>
-
 
         </div> 
             <div class="row">
@@ -81,13 +93,79 @@
             </div>
 
     </div>   
+
+<div class="modal fade" id="modalRuta" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Crear Ruta</h5>
+        <button type="button" class="close text-white" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Selección de Variante -->
+        <div class="form-group">
+          <label>Seleccione Variante</label>
+          <select id="modal_idVariante" class="form-control">
+              <option value="">Seleccione</option>
+              <?php
+              require 'bd/config.php';
+              $sql_variantes = "SELECT idVariante, nombreVariante FROM variante ORDER BY nombreVariante";
+              $result_variantes = $conn->query($sql_variantes);
+              while($row = $result_variantes->fetch_assoc()){
+                  echo '<option value="'.$row['idVariante'].'">'.$row['nombreVariante'].'</option>';
+              }
+              ?>
+          </select>
+        </div>
+
+        <hr>
+
+        <!-- Botón agregar control -->
+        <button type="button" class="btn btn-success mb-3" onclick="agregarFila()">
+            Agregar Control
+        </button>
+
+        <!-- Tabla dinámica -->
+        <table class="table table-bordered" id="tablaControles">
+          <thead class="bg-secondary text-white">
+            <tr>
+              <th>Posición</th>
+              <th>Control</th>
+              <th>Minutos</th>
+              <th>Tolerancia</th>
+              <th>Tipo Días</th>
+              <th>Hora Desde</th>
+              <th>Hora Hasta</th>
+              <th>Tabla Valores</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="guardarRuta()">
+          Guardar Ruta
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
     
-                <!-- Modal de Edición -->
+                <!-- Modal de Edición de ruta VIEJOOOOOOOOOOOOOOO -->
 <div class="modal fade" id="editarModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="editarModalLabel">Editar Ruta</h5>
+                <h5 class="modal-title" id="editarModalLabel">Editar Rutaa</h5>
               <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body">
@@ -96,7 +174,7 @@
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="edit_idVariante" class="form-label">N° Variante</label>
+                            <label for="idVariante" class="form-label">N° Variante</label>
                             <select class="form-control" id="edit_idVariante" name="idVariante" required>
                                 <option value="">Seleccione una variante</option>
                                 <?php
@@ -198,8 +276,95 @@
     </div>
 </div>
 
+
+<?php include 'script_editar_ruta.php';?>
+
+<script>
+
+let contador = 0;
+
+function agregarFila() {
+
+    if(document.getElementById("modal_idVariante").value == ""){
+        alert("Debe seleccionar una variante primero");
+        return;
+    }
+
+    let fila = `
+        <tr>
+            <td><input type="number" class="form-control" name="posicion[]"></td>
+            <td>
+                <select class="form-control" name="idControl[]">
+                    <option value="">Seleccione</option>
+                    <?php
+                    $sql_control = "SELECT idControl, nombreControl FROM controles";
+                    $res_control = $conn->query($sql_control);
+                    while($row_control = $res_control->fetch_assoc()){
+                        echo '<option value="'.$row_control['idControl'].'">'.$row_control['nombreControl'].'</option>';
+                    }
+                    ?>
+                </select>
+            </td>
+            <td><input type="number" class="form-control" name="minutos[]"></td>
+            <td><input type="number" class="form-control" name="tolerancia[]"></td>
+            <td><input type="text" class="form-control" name="tipoDias[]"></td>
+            <td><input type="time" class="form-control" name="horaDesde[]"></td>
+            <td><input type="time" class="form-control" name="horaHasta[]"></td>
+            <td><input type="number" class="form-control" name="idTablaValores[]"></td>
+            <td><button type="button" class="btn btn-danger" onclick="this.closest('tr').remove()">X</button></td>
+        </tr>
+    `;
+
+    document.querySelector("#tablaControles tbody").insertAdjacentHTML("beforeend", fila);
+}
+
+function guardarRuta(){
+
+    let variante = document.getElementById("modal_idVariante").value;
+
+    if(variante == ""){
+        alert("Seleccione variante");
+        return;
+    }
+
+    let filas = document.querySelectorAll("#tablaControles tbody tr");
+
+    if(filas.length == 0){
+        alert("Debe agregar al menos un control");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("idVariante", variante);
+
+    filas.forEach((fila, index) => {
+        formData.append("posicion[]", fila.querySelector('[name="posicion[]"]').value);
+        formData.append("idControl[]", fila.querySelector('[name="idControl[]"]').value);
+        formData.append("minutos[]", fila.querySelector('[name="minutos[]"]').value);
+        formData.append("tolerancia[]", fila.querySelector('[name="tolerancia[]"]').value);
+        formData.append("tipoDias[]", fila.querySelector('[name="tipoDias[]"]').value);
+        formData.append("horaDesde[]", fila.querySelector('[name="horaDesde[]"]').value);
+        formData.append("horaHasta[]", fila.querySelector('[name="horaHasta[]"]').value);
+        formData.append("idTablaValores[]", fila.querySelector('[name="idTablaValores[]"]').value);
+    });
+
+    fetch("rutas/vista/guardar_ruta.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.text())
+    .then(data => {
+        alert("Ruta guardada correctamente");
+        location.reload();
+    });
+
+}
+
+</script>
+
     <script>
-        /* Llamando a la función getData() */
+        /*MUESTRA LOS DATOS EN LA TABLA Y PAGINACION
+         Llamando a la función getData() */
         getData()
 
         /* Escuchar un evento keyup en el campo de entrada y luego llamar a la función getData. */
@@ -280,7 +445,7 @@
     <!-- Bootstrap core JS -->
     <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>-->
 
-
+<!-------------EDITOR VIJEO-------------------------->
 <script>
     // Función para cargar los datos de la ruta a editar
 function editarRuta(idRuta) {

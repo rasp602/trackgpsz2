@@ -125,13 +125,17 @@ if ($num_rows > 0) {
         $output['data'] .= '<td>
         <button class="btn btn-sm btn-primary" onclick="editarRuta(' . $row['idRuta'] . ')">
             <i class="glyphicon glyphicon-edit"></i> Editar
-        </button>  
+        </button> 
+        <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('.$row['idVariante'].')">
+        Editar N
+      </button>
         <a class="btn btn-sm btn-danger" 
         href="?c=rutas&a=Eliminar&idRuta=' . $row['idRuta'] . '" 
         onclick="return confirm(\'¿Seguro de eliminar este registro?\');">
             <i class="glyphicon glyphicon-trash"></i>Eliminar
         </a>
         </td>';
+        
         $output['data'] .= '</tr>';
     }
 } else {

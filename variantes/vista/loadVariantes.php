@@ -113,7 +113,11 @@ if ($num_rows > 0) {
         $output['data'] .= '<td>' . $row['primeraSalida'] . '</td>';
         $output['data'] .= '<td>' . $row['colorVariante'] . '</td>';
 
-        $output['data'] .= '<td><a class="glyphicon glyphicon-edit" href="?c=variantes&a=Crud1&idVariante=' . $row['idVariante'] . '">Editar</a>  
+        $output['data'] .= '<td>
+            <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('.$row['idVariante'].')">
+        Configurar Ruta
+      </button>
+        <a class="glyphicon glyphicon-edit" href="?c=variantes&a=Crud1&idVariante=' . $row['idVariante'] . '">Editar</a>  
         <a class="glyphicon glyphicon-trash" href="?c=variantes&a=Eliminar&idVariante='. $row['idVariante'] . '" onclick="return confirm(\'¿Seguro que deseas eliminar este registro?\')">
    Eliminar
 </a>

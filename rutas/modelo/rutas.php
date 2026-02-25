@@ -128,7 +128,7 @@ class Rutas
 		}
 		
 	}
-public function ActualizarRol($data)
+public function ActualizarRuta($data)
 	{
 		try 
 		{
@@ -173,7 +173,7 @@ public function ActualizarRol($data)
 		{
 			$stm = $this->pdo->prepare("DELETE FROM ruta WHERE idRuta = ?");			          
 
-			$stm->execute(array($idBus));
+			$stm->execute(array($idRuta));
 		} catch (Exception $e) 
 		{
 			die($e->getMessage());

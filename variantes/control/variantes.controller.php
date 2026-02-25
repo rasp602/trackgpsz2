@@ -17,7 +17,7 @@ class VariantesController{
         require_once 'includes/footer.php';
     }
         public function menuVariantes(){
-        require_once 'includes/header.php';
+        require_once 'includes/header_variante.php';
         require_once 'variantes/vista/variantes_list.php';
         require_once 'includes/footer.php';
     }
