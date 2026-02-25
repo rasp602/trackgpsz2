@@ -1,51 +1,88 @@
 <?php
 require '../../bd/config.php';
 
-$idVariante = $_POST['idVariante'];
-$idRuta = $_POST['idRuta'];
-$posicion = $_POST['posicion'];
-$idControl = $_POST['idControl'];
-$minutos = $_POST['minutos'];
-$tolerancia = $_POST['tolerancia'];
-$tipoDias = $_POST['tipoDias'];
-$horaDesde = $_POST['horaDesde'];
-$horaHasta = $_POST['horaHasta'];
-$idTablaValores = $_POST['idTablaValores'];
+$conn->begin_transaction();
 
-for($i=0; $i<count($posicion); $i++){
+try {
 
-    if($idRuta[$i] == 0){
+    $idVariante = $_POST['idVariante'];
+    $idRuta = $_POST['idRuta'] ?? [];
+    $posicion = $_POST['posicion'];
+    $idControl = $_POST['idControl'];
+    $minutos = $_POST['minutos'];
+    $tolerancia = $_POST['tolerancia'];
+    $tipoDias = $_POST['tipoDias'];
+    $anguloE = $_POST['anguloE'];
+    $anguloS = $_POST['anguloS'];
+    $multaAtraso = $_POST['multaAtraso'];
 
-        // INSERT
-        $sql = "INSERT INTO ruta
-                (idVariante, posicion, idControl, minutos, tolerancia, tipoDias, horaDesde, horaHasta, idTablaValores)
-                VALUES
-                ('$idVariante',
-                 '{$posicion[$i]}',
-                 '{$idControl[$i]}',
-                 '{$minutos[$i]}',
-                 '{$tolerancia[$i]}',
-                 '{$tipoDias[$i]}',
-                 '{$horaDesde[$i]}',
-                 '{$horaHasta[$i]}',
-                 '{$idTablaValores[$i]}')";
+    // =========================================
+    // 1️⃣ OBTENER IDS ACTUALES EN BD
+    // =========================================
 
-    }else{
+    $idsBD = [];
+    $result = $conn->query("SELECT idRuta FROM ruta WHERE idVariante = '$idVariante'");
 
-        // UPDATE
-        $sql = "UPDATE ruta SET
-                posicion = '{$posicion[$i]}',
-                idControl = '{$idControl[$i]}',
-                minutos = '{$minutos[$i]}',
-                tolerancia = '{$tolerancia[$i]}',
-                tipoDias = '{$tipoDias[$i]}',
-                horaDesde = '{$horaDesde[$i]}',
-                horaHasta = '{$horaHasta[$i]}',
-                idTablaValores = '{$idTablaValores[$i]}'
-                WHERE idRuta = '{$idRuta[$i]}'";
+    while($row = $result->fetch_assoc()){
+        $idsBD[] = $row['idRuta'];
     }
 
-    $conn->query($sql);
-}
+    // =========================================
+    // 2️⃣ DETECTAR IDS ELIMINADOS
+    // =========================================
 
-echo "ok";
+    $idsEliminar = array_diff($idsBD, $idRuta);
+
+    foreach($idsEliminar as $idEliminar){
+        $conn->query("DELETE FROM ruta WHERE idRuta = '$idEliminar'");
+    }
+
+    // =========================================
+    // 3️⃣ INSERT / UPDATE
+    // =========================================
+
+    for($i=0; $i<count($posicion); $i++){
+
+        if($idRuta[$i] == 0){
+
+            // INSERT
+            $sql = "INSERT INTO ruta
+                    (idVariante, posicion, idControl, minutos, tolerancia, tipoDias, anguloE, anguloS, multaAtraso)
+                    VALUES
+                    ('$idVariante',
+                     '{$posicion[$i]}',
+                     '{$idControl[$i]}',
+                     '{$minutos[$i]}',
+                     '{$tolerancia[$i]}',
+                     '{$tipoDias[$i]}',
+                     '{$anguloE[$i]}',
+                     '{$anguloS[$i]}',
+                     '{$multaAtraso[$i]}')";
+
+        }else{
+
+            // UPDATE
+            $sql = "UPDATE ruta SET
+                    posicion = '{$posicion[$i]}',
+                    idControl = '{$idControl[$i]}',
+                    minutos = '{$minutos[$i]}',
+                    tolerancia = '{$tolerancia[$i]}',
+                    tipoDias = '{$tipoDias[$i]}',
+                    anguloE = '{$anguloE[$i]}',
+                    anguloS = '{$anguloS[$i]}',
+                    multaAtraso = '{$multaAtraso[$i]}'
+                    WHERE idRuta = '{$idRuta[$i]}'";
+        }
+
+        $conn->query($sql);
+    }
+
+    $conn->commit();
+
+    echo "ok";
+
+} catch(Exception $e){
+
+    $conn->rollback();
+    echo "error";
+}

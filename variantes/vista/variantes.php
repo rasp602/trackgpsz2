@@ -102,9 +102,9 @@
               <th>Minutos</th>
               <th>Tolerancia</th>
               <th>Tipo Días</th>
-              <th>Hora Desde</th>
-              <th>Hora Hasta</th>
-              <th>Tabla Valores</th>
+              <th>Ang Entrada</th>
+              <th>Ang Salida</th>
+              <th>Multa Atraso</th>
               <th>Eliminar</th>
             </tr>
           </thead>
@@ -152,9 +152,9 @@
                     <td><input type="number" class="form-control" value="${row.minutos}"></td>
                     <td><input type="number" class="form-control" value="${row.tolerancia}"></td>
                     <td><input type="text" class="form-control" value="${row.tipoDias}"></td>
-                    <td><input type="time" class="form-control" value="${row.horaDesde}"></td>
-                    <td><input type="time" class="form-control" value="${row.horaHasta}"></td>
-                    <td><input type="number" class="form-control" value="${row.idTablaValores}"></td>
+                    <td><input type="number" class="form-control" value="${row.anguloE}"></td>
+                    <td><input type="number" class="form-control" value="${row.anguloS}"></td>
+                    <td><input type="number" class="form-control" value="${row.multaAtraso}"></td>
                     <td>
                         <button class="btn btn-danger" onclick="this.closest('tr').remove()">X</button>
                     </td>
@@ -191,8 +191,8 @@
             <td><input type="number" class="form-control"></td>
             <td><input type="number" class="form-control"></td>
             <td><input type="text" class="form-control"></td>
-            <td><input type="time" class="form-control"></td>
-            <td><input type="time" class="form-control"></td>
+            <td><input type="number" class="form-control"></td>
+            <td><input type="number" class="form-control"></td>
             <td><input type="number" class="form-control"></td>
             <td>
                 <button class="btn btn-danger" onclick="this.closest('tr').remove()">X</button>
@@ -222,9 +222,9 @@
         formData.append("minutos[]", fila.cells[2].querySelector("input").value);
         formData.append("tolerancia[]", fila.cells[3].querySelector("input").value);
         formData.append("tipoDias[]", fila.cells[4].querySelector("input").value);
-        formData.append("horaDesde[]", fila.cells[5].querySelector("input").value);
-        formData.append("horaHasta[]", fila.cells[6].querySelector("input").value);
-        formData.append("idTablaValores[]", fila.cells[7].querySelector("input").value);
+        formData.append("anguloE[]", fila.cells[5].querySelector("input").value);
+        formData.append("anguloS[]", fila.cells[6].querySelector("input").value);
+        formData.append("multaAtraso[]", fila.cells[7].querySelector("input").value);
     });
 
     fetch("variantes/vista/actualizar_ruta.php", {
