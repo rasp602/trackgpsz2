@@ -6,6 +6,7 @@ class Tarjetas
     public $idTarjeta;
     public $fechaSalida;
     public $horaTarjeta;
+    public $horaFin;
     public $idBus;
 	public $idVariante;
 	public $idPersona;
@@ -60,7 +61,7 @@ class Tarjetas
 			$result = array();
 
 			$stm = $this->pdo->prepare("SELECT
-tarjeta.idTarjeta,tarjeta.fechaSalida,tarjeta.horaTarjeta,tarjeta.idBus,tarjeta.idVariante,tarjeta.idPersona,tarjeta.frecuenciaTarjeta,
+tarjeta.idTarjeta,tarjeta.fechaSalida,tarjeta.horaTarjeta,tarjeta.horaFin,tarjeta.idBus,tarjeta.idVariante,tarjeta.idPersona,tarjeta.frecuenciaTarjeta,
 tarjeta.fechaGenerado,tarjeta.busDelantero,tarjeta.busTrasero,buses.idBus,buses.numeroBus,buses.placaBus,variante.idVariante,variante.numeroVariante,
 variante.nombreVariante,variante.sentido,persona.idPersona,persona.nombre1Persona,persona.apellido1Persona
 FROM tarjeta
@@ -337,28 +338,51 @@ $stmtLock->execute([
     // Hora base desde la tarjeta recién creada
 $horaProgramada = new DateTime($data->horaTarjeta);
 
+$controles = $this->ObtenerControlesPorVariante($data->idVariante);
+
+$horaProgramada = new DateTime($data->horaTarjeta);
+
 $sqlDetalle = "INSERT INTO detalleTarjeta
                (idTarjeta, idControl, horaProgramada, horaMarcada, diferenciaMinutos, toleranciaAsignada, valorPago)
                VALUES (?,?,?,?,?,?,?)";
 
 $stmDetalle = $this->pdo->prepare($sqlDetalle);
 
-foreach ($controles as $index => $control)
-{
-    if ($index > 0) {
-        $horaProgramada->modify("+{$control->minutos} minutes");
-    }
+$horaFinCalculada = $data->horaTarjeta; // valor inicial
 
-    $stmDetalle->execute([
-        $idTarjeta,
-        $control->idControl,
-        $horaProgramada->format('H:i:s'),
-        null,
-        null,
-        $control->tolerancia,
-        null
-    ]);
+if ($controles && is_array($controles)) {
+
+    foreach ($controles as $index => $control)
+    {
+        if ($index > 0) {
+            $horaProgramada->modify("+{$control->minutos} minutes");
+        }
+
+        $horaFinCalculada = $horaProgramada->format('H:i:s');
+
+        $stmDetalle->execute([
+            $idTarjeta,
+            $control->idControl,
+            $horaProgramada->format('H:i:s'),
+            null,
+            null,
+            $control->tolerancia,
+            null
+        ]);
+    }
 }
+
+// 🔹 Actualizar horaFin
+$updateHoraFin = $this->pdo->prepare("
+    UPDATE tarjeta 
+    SET horaFin = ?
+    WHERE idTarjeta = ?
+");
+
+$updateHoraFin->execute([
+    $horaFinCalculada,
+    $idTarjeta
+]);
 
         $this->pdo->commit();
 
@@ -561,6 +585,7 @@ public function ListarTarjetasPorFecha($fecha)
     $sql = "SELECT t.idTarjeta,
                    t.fechaSalida,
                    t.horaTarjeta,
+                   t.horaFin,
                    t.frecuenciaTarjeta,
                    b.placaBus,
                    b.numeroBus,

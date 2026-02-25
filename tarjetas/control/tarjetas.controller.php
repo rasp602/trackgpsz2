@@ -94,6 +94,7 @@ public function Guardar(){
     $vte->idTarjeta = $_REQUEST['idTarjeta'];
     $vte->fechaSalida = $_REQUEST['fechaSalida'];
     $vte->horaTarjeta = $_REQUEST['horaTarjeta'];
+    $vte->horaFin = null; // Se asignará posteriormente en el modelo
     $vte->idBus = $_REQUEST['idBus'];
     $vte->idVariante = $_REQUEST['idVariante'];
     $vte->idPersona = $_REQUEST['idPersona'];

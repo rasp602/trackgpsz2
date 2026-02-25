@@ -126,7 +126,8 @@
                     <thead>
                         <tr>
                             <th>Fecha</th>
-                            <th>Hora</th>
+                            <th>Hora Ini</th>
+                            <th>Hora Fin</th>
                             <th>Placa</th>
                             <th>Bus</th>
                             <th>Variante</th>
@@ -142,7 +143,8 @@
                         <?php foreach ($this->model->ListarTarjetasNuevo() as $tarjeta): ?>
                             <tr>
                                 <td><?php echo $tarjeta->fechaSalida ?></td>
-                               <td><?php echo $tarjeta->horaTarjeta; ?></td>   
+                               <td><?php echo $tarjeta->horaTarjeta; ?></td> 
+                                <td><?php echo $tarjeta->horaFin; ?></td>   
                                 <td><?php echo $tarjeta->placaBus; ?></td>
                                 <td><?php echo $tarjeta->numeroBus; ?></td>
                                 <td><?php echo $tarjeta->nombreVariante; ?></td> 
@@ -231,6 +233,7 @@ document.getElementById("fechaSalida").addEventListener("change", function() {
                     <tr>
                         <td>${t.fechaSalida}</td>
                         <td>${t.horaTarjeta}</td>
+                        <td>${t.horaFin}</td>
                         <td>${t.placaBus}</td>
                         <td>${t.numeroBus}</td>
                         <td>${t.nombreVariante}</td>
@@ -311,6 +314,7 @@ $(document).ready(function(){
         var idPersona = $("#idPersona").val();
         var idBus = $("#idBus").val();    
         var fechaSalida = $("#fechaSalida").val();
+        var horaFin = null;
         var idVariante = $("#idVariante").val();     
         var frecuenciaTarjeta = $("#frecuenciaTarjeta").val();
         var busDelantero = $("#busDelantero").val();
@@ -325,7 +329,8 @@ $(document).ready(function(){
             "busDelantero": busDelantero,
             "busTrasero": busTrasero,
             "horaTarjeta": horaTarjeta,
-            "fechaSalida": fechaSalida
+            "fechaSalida": fechaSalida,
+            "horaFin": horaFin
         };
 
         console.log("Parámetros a enviar:", parametros); // Verificar valores antes de enviar
