@@ -6,7 +6,7 @@
 <!--<script src="hotel/js/ajaxH.js"></script>-->
 
 <div class="container-fluid">
-             <?php 
+         <?php 
             $usuario = null;
               if (isset($_SESSION["usuarioInventario"]))
               {
@@ -23,7 +23,7 @@
                                 include_once 'menu_principal/vista/Menu_Fiscalizador.php';   
                         } 
                }               
-         ?> 
+         ?>
      <?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>  
 
      <?php if (isset($_GET["success"])) echo '<div class="alert alert-info" role="alert"> Variante registrada correctamente..</div>'; ?> 
