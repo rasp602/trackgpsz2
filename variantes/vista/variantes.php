@@ -224,7 +224,8 @@
     .then(data => {
 
         data.forEach(row => {
-
+        let icono = row.tieneDetalle == 1 ? "🟢" : "➕";
+        let claseBtn = row.tieneDetalle == 1 ? "btn-success" : "btn-info";
             let fila = `
                 <tr data-idRuta="${row.idRuta}">
                     <td>
@@ -240,11 +241,11 @@
                     <td>
                         <div class="d-flex">
                             <input type="number" class="form-control minutos-input" value="${row.minutos}">
-                            <button type="button"
-                                    class="btn btn-info btn-sm ml-1"
-                                    onclick="abrirDetalleMinutos(this)">
-                                +
-                            </button>
+                        <button type="button"
+                            class="btn ${claseBtn} btn-sm ml-1"
+                            onclick="abrirDetalleMinutos(this)">
+                        ${icono}
+                    </button>
                         </div>
                     </td>
 
@@ -464,16 +465,14 @@ function abrirDetalleMinutos(boton){
 <!--GUARDAR DETALLE MINUTOS-->
 
 <script>
-  function guardarDetalleMinutos(){
+function guardarDetalleMinutos() {
 
     let idControl = window.detalleContexto.idControl;
     let filas = document.querySelectorAll("#tablaDetalleMinutos tbody tr");
-
     let formData = new FormData();
     formData.append("idControl", idControl);
 
     filas.forEach(fila => {
-
         formData.append("tipoDia[]", fila.cells[0].querySelector("select").value);
         formData.append("desdeHora[]", fila.cells[1].querySelector("input").value);
         formData.append("hastaHora[]", fila.cells[2].querySelector("input").value);
@@ -487,16 +486,36 @@ function abrirDetalleMinutos(boton){
     })
     .then(res => res.json())
     .then(data => {
-
-        if(data.status === "ok"){
+        if (data.status === "ok") {
             alert("Detalle guardado correctamente");
             $('#modalDetalleMinutos').modal('hide');
+
+            const filaControl = document.querySelector(`#tablaEditarControles tbody tr[data-idRuta="${idControl}"]`);
+            if (filaControl) {
+                const btn = filaControl.querySelector("button.btn-sm");
+                if (data.tieneDetalle == 1) {
+                    btn.classList.remove("btn-info");
+                    btn.classList.add("btn-success");
+                    btn.textContent = "🟢";
+                } else {
+                    btn.classList.remove("btn-success");
+                    btn.classList.add("btn-info");
+                    btn.textContent = "➕";
+                }
+            }
+
         } else {
             alert(data.message);
         }
-    });
+    })
+    .catch(err => console.error("Error en fetch:", err));
 }
 </script>
+
+
+
+
+
 <!--FUNCIONES DE ORDENAMIENTO, FILTRADO Y PAGINACION-->
 
     <script>

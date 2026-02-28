@@ -1,21 +1,47 @@
 <?php
 require '../../bd/config.php';
 
-$idVariante = $_GET['idVariante'];
+header('Content-Type: application/json');
 
-$sql = "SELECT * FROM ruta WHERE idVariante = '$idVariante'";
-$result = $conn->query($sql);
+try {
 
-$data = [];
+    if (!isset($_GET['idVariante'])) {
+        throw new Exception("idVariante no recibido");
+    }
 
-while($row = $result->fetch_assoc()){
+    if (!isset($conn)) {
+        throw new Exception("Conexión no inicializada");
+    }
 
-    // generar select de controles con seleccionado
+    $idVariante = $_GET['idVariante'];
+
+    // Consulta principal
+    $stmt = $conn->prepare("SELECT * FROM ruta WHERE idVariante = ?");
+    $stmt->bind_param("i", $idVariante);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $data = [];
+
+while ($row = $result->fetch_assoc()) {
+
+    // Verificar si tiene detalle
+    $stmtDetalle = $conn->prepare("SELECT COUNT(*) as total FROM detalleControl WHERE idControl = ?");
+    $stmtDetalle->bind_param("i", $row['idControl']);
+    $stmtDetalle->execute();
+    $resDetalle = $stmtDetalle->get_result();
+    $detalle = $resDetalle->fetch_assoc();
+
+    $row['tieneDetalle'] = ($detalle['total'] > 0) ? 1 : 0;
+
+    // Consulta controles
+    $stmtControl = $conn->prepare("SELECT idControl, nombreControl FROM controles");
+    $stmtControl->execute();
+    $res_control = $stmtControl->get_result();
+
     $select = "";
-    $sql_control = "SELECT idControl, nombreControl FROM controles";
-    $res_control = $conn->query($sql_control);
 
-    while($ctrl = $res_control->fetch_assoc()){
+    while ($ctrl = $res_control->fetch_assoc()) {
         $selected = ($ctrl['idControl'] == $row['idControl']) ? "selected" : "";
         $select .= "<option value='{$ctrl['idControl']}' $selected>{$ctrl['nombreControl']}</option>";
     }
@@ -24,4 +50,13 @@ while($row = $result->fetch_assoc()){
     $data[] = $row;
 }
 
-echo json_encode($data);
+    echo json_encode($data);
+
+} catch (Throwable $e) {
+
+    echo json_encode([
+        "error" => true,
+        "mensaje" => $e->getMessage()
+    ]);
+
+}
