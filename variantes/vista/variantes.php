@@ -160,12 +160,59 @@
   </div>
 </div>
 
+<div class="modal fade" id="modalDetalleMinutos" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">Detalle Minutos por Rango Horario</h5>
+        <button type="button" class="close text-white" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+<input type="hidden" id="idControl">
+        <button type="button"
+                class="btn btn-success mb-3"
+                onclick="agregarFilaDetalle()">
+          Agregar Rango
+        </button>
+
+        <table class="table table-bordered" id="tablaDetalleMinutos">
+          <thead class="bg-secondary text-white">
+            <tr>
+              <th>Tipo Día</th>
+              <th>Desde</th>
+              <th>Hasta</th>
+              <th>+ Minutos</th>
+              <th>Tolerancia</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-primary"
+                onclick="guardarDetalleMinutos()">
+          Guardar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script src="plugins/jquery/jquery.min.js"></script>
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="dist/js/adminlte.min.js"></script>
 
 
-
+<!--EDITOR DE RUTA-->
 <script>
     function abrirModalEditar(idVariante){
 
@@ -191,7 +238,14 @@
                     </td>
 
                     <td>
-                        <input type="number" class="form-control" value="${row.minutos}">
+                        <div class="d-flex">
+                            <input type="number" class="form-control minutos-input" value="${row.minutos}">
+                            <button type="button"
+                                    class="btn btn-info btn-sm ml-1"
+                                    onclick="abrirDetalleMinutos(this)">
+                                +
+                            </button>
+                        </div>
                     </td>
 
                     <td>
@@ -236,12 +290,14 @@
     });
 }
 </script>
+<!--AGREGAR FILA EN EDITOR DE RUTA-->
 <script>
     function agregarFilaEditar(){
 
     let fila = `
         <tr data-idRuta="0">
             <td><input type="number" class="form-control"></td>
+            
             <td>
                 <select class="form-control">
                     <option value="">Seleccione</option>
@@ -255,7 +311,16 @@
                     ?>
                 </select>
             </td>
-            <td><input type="number" class="form-control"></td>
+          <td>
+            <div class="d-flex">
+                <input type="number" class="form-control minutos-input">
+                <button type="button"
+                        class="btn btn-info btn-sm ml-1"
+                        onclick="abrirDetalleMinutos(this)">
+                    +
+                </button>
+            </div>
+           </td>
             <td><input type="number" class="form-control"></td>
             <td>
                 <select class="form-control">
@@ -278,7 +343,7 @@
     .insertAdjacentHTML("beforeend", fila);
 }
 </script>
-
+<!--GUARDAR RUTA EDITADA-->
 <script>
     function guardarEdicionRuta(){
 
@@ -313,6 +378,126 @@
 }
 </script>
 
+<!--ABRIR DETALLE MINUTOS-->
+<script>
+function abrirDetalleMinutos(boton){
+
+    let fila = boton.closest("tr");
+    let idControl = fila.cells[1].querySelector("select").value;
+
+    if(!idControl){
+        alert("Debe seleccionar un control primero");
+        return;
+    }
+
+    // 🔥 SOLO guardamos el idControl
+    window.detalleContexto = {
+        idControl: idControl
+    };
+
+    document.querySelector("#tablaDetalleMinutos tbody").innerHTML = "";
+
+    fetch("variantes/vista/obtener_detalle_minutos.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "idControl=" + idControl
+    })
+    .then(res => res.json())
+    .then(response => {
+
+        if(!response.success){
+            console.error(response.message);
+            return;
+        }
+
+        response.data.forEach(row => {
+            agregarFilaDetalle(
+                row.tipoDia,
+                row.desdeHora,
+                row.hastaHora,
+                row.masMinutos,
+                row.tolerancia
+            );
+        });
+
+        $('#modalDetalleMinutos').modal('show');
+    });
+}
+</script>
+<!--AGREGAR FILA EN DETALLE MINUTOS-->
+<script>
+    function agregarFilaDetalle(
+    tipoDia = '',
+    desde = '',
+    hasta = '',
+    masMin = '',
+    tolerancia = ''
+){
+
+    let fila = `
+        <tr>
+            <td>
+                <select class="form-control">
+                    <option value="LABORAL" ${tipoDia=='LABORAL'?'selected':''}>LABORAL</option>
+                    <option value="SABADO" ${tipoDia=='SABADO'?'selected':''}>SÁBADO</option>
+                    <option value="DOMINGO" ${tipoDia=='DOMINGO'?'selected':''}>DOMINGO</option>
+                    <option value="FESTIVO" ${tipoDia=='FESTIVO'?'selected':''}>FESTIVO</option>
+                </select>
+            </td>
+            <td><input type="time" class="form-control" value="${desde}"></td>
+            <td><input type="time" class="form-control" value="${hasta}"></td>
+            <td><input type="number" class="form-control" value="${masMin}"></td>
+            <td><input type="number" class="form-control" value="${tolerancia}"></td>
+            <td>
+                <button class="btn btn-danger btn-sm"
+                        onclick="this.closest('tr').remove()">X</button>
+            </td>
+        </tr>
+    `;
+
+    document.querySelector("#tablaDetalleMinutos tbody")
+    .insertAdjacentHTML("beforeend", fila);
+}
+</script>
+<!--GUARDAR DETALLE MINUTOS-->
+
+<script>
+  function guardarDetalleMinutos(){
+
+    let idControl = window.detalleContexto.idControl;
+    let filas = document.querySelectorAll("#tablaDetalleMinutos tbody tr");
+
+    let formData = new FormData();
+    formData.append("idControl", idControl);
+
+    filas.forEach(fila => {
+
+        formData.append("tipoDia[]", fila.cells[0].querySelector("select").value);
+        formData.append("desdeHora[]", fila.cells[1].querySelector("input").value);
+        formData.append("hastaHora[]", fila.cells[2].querySelector("input").value);
+        formData.append("masMinutos[]", fila.cells[3].querySelector("input").value);
+        formData.append("tolerancia[]", fila.cells[4].querySelector("input").value);
+    });
+
+    fetch("variantes/vista/guardar_detalle_minutos.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if(data.status === "ok"){
+            alert("Detalle guardado correctamente");
+            $('#modalDetalleMinutos').modal('hide');
+        } else {
+            alert(data.message);
+        }
+    });
+}
+</script>
+<!--FUNCIONES DE ORDENAMIENTO, FILTRADO Y PAGINACION-->
 
     <script>
         /* Llamando a la función getData() */
