@@ -1,19 +1,28 @@
 <?php
 
+
+
 class Database
 {
     public static function Conectar()
     {
-        $host = "193.203.175.238";
-        $dbname = "u854084565_trackgpsz1";
-        $user = "u854084565_Rodri24";
-        $pass = "Rodrigo2410$";
+        try {
 
-        $pdo = new PDO("mysql:host=$host;port=3306;dbname=$dbname;charset=utf8", $user, $pass);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $host = "193.203.175.238";
+            $dbname = "u854084565_trackgpsz1";
+            $user = "u854084565_Rodri24";
+            $pass = "Rodrigo2410$";
 
-        return $pdo;
-		    echo "CONEXION OK";
+            $pdo = new PDO("mysql:host=$host;port=3306;dbname=$dbname;charset=utf8", $user, $pass);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            return $pdo;
+
+        } catch (PDOException $e) {
+
+            die("Error de conexión: " . $e->getMessage());
+
+        }
     }
 }
 /*
