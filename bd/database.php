@@ -1,11 +1,19 @@
 <?php
+
 class Database
 {
     public static function Conectar()
     {
-        $pdo = new PDO('mysql:host=srv1056.hstgr.io;port=3306;dbname=u854084565_trackgpsz1;charset=utf8', 'u854084565_Rodri24', 'Rodrigo2410$');
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);	
+        $host = "193.203.175.238";
+        $dbname = "u854084565_trackgpsz1";
+        $user = "u854084565_Rodri24";
+        $pass = "Rodrigo2410$";
+
+        $pdo = new PDO("mysql:host=$host;port=3306;dbname=$dbname;charset=utf8", $user, $pass);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         return $pdo;
+		    echo "CONEXION OK";
     }
 }
 /*
