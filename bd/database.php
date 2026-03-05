@@ -3,7 +3,7 @@ class Database
 {
     public static function Conectar()
     {
-        $pdo = new PDO('mysql:host=localhost;dbname=trackgpszulia;charset=utf8', 'rasp602', 'Rodrigo2410$');
+        $pdo = new PDO('mysql:host=srv1056.hstgr.io;dbname=u854084565_trackgpsz1;charset=utf8', 'u854084565_Rodri24', 'Rodrigo2410$');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);	
         return $pdo;
     }
