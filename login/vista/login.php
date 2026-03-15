@@ -1,5 +1,5 @@
  <?php include_once 'header.php'; ?>
-<?php include_once '../../bd/conexion.php'; ?>
+
 <body>
     
      <div id="header" align="center" class="container-fluid"> 
