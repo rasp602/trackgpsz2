@@ -48,17 +48,7 @@ if (!isset($_SESSION['usuarioInventario']))
     </a>
 <br>
     <!-- Sidebar -->
-    <div class="sidebar">    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i> Menú</a>
-      </li>
-      <li class="nav-item d-none d-sm-inline-block">
-        <a href="?c=menu_principal&a=menu_usuarios" class="nav-link">Inicio</a>
-      </li>
-      <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Contactos</a>
-      </li>
-    </ul>
+    <div class="sidebar">
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
