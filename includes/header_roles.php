@@ -46,7 +46,7 @@
 <body class="hold-transition sidebar-mini layout-fixed">
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="http://code.jquery.com/jquery-latest.js"></script>
+      <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <script src="js/bootstrap.js"></script>
         <script src="js/bootstrap.min.js"></script>
@@ -58,6 +58,8 @@
         <script src="js/header.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script src="https://kit.fontawesome.com/1d0ff78093.js" crossorigin="anonymous"></script>
+        <script src="/assets/js/bootstrap.min.js"></script>
+        <script src="/assets/js/IFrame.js"></script>
 <div class="wrapper">
 
 
