@@ -12,7 +12,7 @@ class VisorController{
     
 
         public function menuVisor(){
-        require_once 'includes/header_roles.php';
+        require_once 'includes/header_visor.php';
         require_once 'visor/vista/visor_list.php';
         require_once 'includes/footer.php';
     }
