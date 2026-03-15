@@ -81,24 +81,16 @@ if (!isset($_SESSION['usuarioInventario']))
         </div>
       </div>
 
-      <!-- SidebarSearch Form
-      <div class="form-inline">
-        <div class="input-group" data-widget="sidebar-search">
-          <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-sidebar">
-              <i class="fas fa-search fa-fw"></i>
-            </button>
-          </div>
-        </div>
-      </div> -->
+
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
+        
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
           <li class="nav-item menu-open">
+            
             <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
@@ -181,7 +173,11 @@ if (!isset($_SESSION['usuarioInventario']))
                   <p>Tabla de valores</p>
                 </a>
               </li>   
-                                   
+      
+ 
+
+
+                             
               <li class="nav-item">
                 <a href="?c=usuarios&a=menuUsuario" class="nav-link">
                   <i class='fas fa-user-alt' style='font-size:24px'></i>
@@ -227,20 +223,6 @@ if (!isset($_SESSION['usuarioInventario']))
             </ul>
           </li>
       
-      
-      
-<!--          <li class="nav-header">EXAMPLES</li>
-
-
-
-          <li class="nav-header">MISCELLANEOUS</li>-->
-       <!--
-          <li class="nav-item">
-            <a href="https://adminlte.io/docs/3.1/" class="nav-link">
-              <i class="nav-icon fas fa-file"></i>
-              <p>EDITAR USUARIO</p>
-            </a>
-          </li>-->
 
              <li class="nav-item">
             
@@ -277,14 +259,10 @@ if (!isset($_SESSION['usuarioInventario']))
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <div class="content-header">
+    
       <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-          
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
+       
+
             
                <div  id="barraUsuarioFecha" align="right">  
                                 <script type="text/javascript">
@@ -303,193 +281,19 @@ if (!isset($_SESSION['usuarioInventario']))
                                   <?php
                      date_default_timezone_set("America/Santiago"); 
                     echo date("H:i:s");?>
-
-
-                    
-                              </div>
+      
             
-            </ol>
-          </div><!-- /.col -->
+   
         </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
+    
+        </div>
+  
     <!-- /.content-header -->
 
     <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-        <!-- Small boxes (Stat box) -->
-        <div class="row">
 
-          <!-- ./col -->
-
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-warning">
-              <div class="inner">
-                <h3 class="cantidad"></h3>
-
-                <h4>Personas registradas</h4>
-              </div>
-              <div class="icon">
-                <i class="ion ion-person-add"></i>
-              </div>
-              <a href="?c=persona&a=Crud" class="small-box-footer">Registrar Persona <i class="fas fa-arrow-circle-right"></i></a>
-            </div>
-          </div>
-          <!-- ./col -->
-
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <h3 class="hospedaje"></h3>
-
-                <h4>Buses</h4>
-              </div>
-                      <div class="icon">
-                <i class="ion  ion-android-bus"></i>
-              </div>
-          
-              
-            <a href="?c=hospedaje&a=Crud" class="small-box-footer">Registrar Bus <i class="fas fa-arrow-circle-right"></i></a>
-            </div>
-          </div>
-    
-          <!-- ./col -->
-
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-danger">
-              <div class="inner">
-                <h3 class="comidas"></h3>
-              <div class="icon">
-                <i class="ion ion-ios-contact"></i>
-              </div>
-                <h4>Usuarios</h4>
-              </div>
-
-              <a href="?c=comida&a=Crud1" class="small-box-footer">Registrar usuario <i class="fas fa-arrow-circle-right"></i></a>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-success">
-              <div class="inner">
-                <h3 class="trabajadores"></h3>
-
-                <h4>Controles</h4>
-              </div>
-              <div class="icon">
-                <i class="ion ion-android-time"></i>
-              </div>
-              <a href="?c=trabajador&a=Crud" class="small-box-footer">Registrar Trabajador <i class="fas fa-arrow-circle-right"></i></a>
-            </div>
-          </div>
-
-
-
-
-
-
-          <!-- ./col -->
-        </div>
-        <!-- /.row -->
-        <!-- Main row -->
- 
-        <!-- /.row (main row) -->
-      </div><!-- /.container-fluid -->
-    </section>
     <!-- /.content -->
 
   <!-- /.content-wrapper -->
   
 
-<script type="text/javascript">
-            /*
-      $(document).ready(function(){
- 
-          var id = 1;
-          var parametros =      
-                {"action":"ajax",id};       
-    
-        $.ajax({
-            url:'persona/reportes/getCantPersonas.php',
-            data: parametros,
-         
-            success:function(data){
-            
-                $(".cantidad1").html(data).fadeIn('slow');
-            
-            }
-        })
-    });*/
-</script>
-      
-     
-
- <script type="text/javascript">
-            /*
-      $(document).ready(function(){
- 
-          var id = 1;
-          var parametros =      
-                {"action":"ajax",id};       
-    
-        $.ajax({
-            url:'persona/reportes/getCantComidas.php',
-            data: parametros,
-         
-            success:function(data){
-            
-                $(".comidas1").html(data).fadeIn('slow');
-            
-            }
-        })
-    });*/
-</script>
-
-
- <script type="text/javascript">
-            /*
-      $(document).ready(function(){
- 
-          var id = 1;
-          var parametros =      
-                {"action":"ajax",id};       
-    
-        $.ajax({
-            url:'hospedaje/reportes/getCantHospedajes.php',
-            data: parametros,
-         
-            success:function(data){
-            
-                $(".hospedaje1").html(data).fadeIn('slow');
-            
-            }
-        })
-    });*/
-</script>
-
-
- <script type="text/javascript">
-            /*
-      $(document).ready(function(){
- 
-          var id = 1;
-          var parametros =      
-                {"action":"ajax",id};       
-    
-        $.ajax({
-            url:'trabajador/reportes/getTrabajadores.php',
-            data: parametros,
-         
-            success:function(data){
-            
-                $(".trabajadores1").html(data).fadeIn('slow');
-            
-            }
-        })
-    });*/
-</script>
