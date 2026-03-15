@@ -43,7 +43,7 @@
   
     	<div class="col-md-12">
     		<div class="outer_div"></div>
-            <iframe src="http://31.97.87.58:3000" width="100%" height="800px" frameborder="0"></iframe>
+            <iframe src="http://31.97.87.58:3000" width="100%" height="1000px" frameborder="0"></iframe>
     	</div>
 
 
