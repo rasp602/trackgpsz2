@@ -113,7 +113,7 @@ if (!isset($_SESSION['usuarioInventario']))
                 </a>
               </li>  
               <li class="nav-item">
-                <a href="31.97.87.58:3000" class="nav-link">
+                <a href="http://31.97.87.58:3000" class="nav-link">
                 <i class='fas fa-map-marked-alt' style='font-size:24px'></i>
                   <p>Visor online</p>
                 </a>
