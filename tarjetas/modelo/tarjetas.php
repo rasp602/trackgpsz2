@@ -316,12 +316,13 @@ $stmtLock->execute([
         }
         // 1️⃣ Insertar tarjeta
         $sql = "INSERT INTO tarjeta 
-                (fechaSalida, horaTarjeta, idBus, idVariante, idPersona, frecuenciaTarjeta, busDelantero, busTrasero) 
-                VALUES (?,?,?,?,?,?,?,?)";
+                (fechaSalida, horaTarjeta,horaFin, idBus, idVariante, idPersona, frecuenciaTarjeta, busDelantero, busTrasero) 
+                VALUES (?,?,?,?,?,?,?,?,?)";
 
         $this->pdo->prepare($sql)->execute([
             $data->fechaSalida,
             $data->horaTarjeta,
+            $data->horaFin,
             $data->idBus,
             $data->idVariante,
             $data->idPersona,
@@ -411,6 +412,7 @@ public function ActualizarTarjeta($data)
 					idVariante = ?,
 					idPersona = ?,
 					frecuenciaTarjeta = ?,
+					horaFin = ?,    
 					busDelantero = ?,
                     busTraseroob = ?,
 			       WHERE idTarjeta = ?";
@@ -425,6 +427,7 @@ public function ActualizarTarjeta($data)
                    $data->idVariante,
 				   $data->idPersona,
 				   $data->frecuenciaTarjeta,
+                   $data->horaFin,
 				   $data->busDelantero,
 				   $data->busTrasero,
 
@@ -514,6 +517,7 @@ public function ObtenerPorId($idTarjeta)
         SELECT
             tarjeta.idTarjeta,
             tarjeta.fechaSalida,
+            tarjeta.horaFin,
             tarjeta.horaTarjeta,
             tarjeta.frecuenciaTarjeta,
             tarjeta.fechaGenerado,

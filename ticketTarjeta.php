@@ -127,7 +127,7 @@ $horaBase = strtotime($horaTarjeta);
 $printer->text("-----------------------------------------\n");
 $printer->text(sprintf("%-25s %10s\n", "PUNTO DE CONTROL", "HORA"));
 $printer->text("-----------------------------------------\n");
-$printer->setTextSize(2, 2); // Tamaño grande
+$printer->setTextSize(1, 1); // Tamaño grande
 // Loop para imprimir los datos alineados
 while ($row = mysqli_fetch_array($consultaRUTA)) {
     if (is_numeric($row['minutos'])) {
