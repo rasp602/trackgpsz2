@@ -136,7 +136,7 @@
                                     <th>Acciones</th>
                                 </tr>
                                 <tr id="filaFiltros">
-                                    <th><input type="text" class="form-control form-control-sm filtro-columna" data-col="0" placeholder="Buscar fecha"></th>
+                                    <th><input type="text" class="form-control form-control-sm filtro-columna" data-col="0" placeholder="Buscar fech"></th>
                                     <th><input type="text" class="form-control form-control-sm filtro-columna" data-col="1" placeholder="Buscar hora ini"></th>
                                     <th><input type="text" class="form-control form-control-sm filtro-columna" data-col="2" placeholder="Buscar hora fin"></th>
                                     <th><input type="text" class="form-control form-control-sm filtro-columna" data-col="3" placeholder="Buscar placa"></th>
