@@ -35,7 +35,7 @@
         <div class="row">
             <!-- Formulario en el lado izquierdo -->
             <div class="col-md-4">
-                <form id="form1" action="index.php?c=Tarjetas&a=Guardar" name="form1" method="post" enctype="multipart/form-data" class="p-4 shadow rounded bg-light">
+                <form id="form1" action="index.php?c=Tarjetas&a=Registrar" name="form1" method="post" enctype="multipart/form-data" class="p-4 shadow rounded bg-light">
                     <h2 class="text-center mb-4">Generador de Tarjeta</h2>
 
                     <?php
@@ -334,7 +334,7 @@ $(document).ready(function(){
         console.log("Parámetros a enviar:", parametros);
 
         $.ajax({
-            url: '?c=tarjetas&a=Guardar',
+            url: '?c=Tarjetas&a=Guardar',
             type: 'POST',
             data: parametros,
             success: function(data){
