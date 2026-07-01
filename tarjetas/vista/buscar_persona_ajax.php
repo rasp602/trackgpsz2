@@ -1,7 +1,7 @@
 <?php
 // simple conexion a la base de datos
 function connect(){
-    return new mysqli("localhost", "rasp602", "Rodrigo2410$", "trackgpszulia");
+    return new mysqli("10.0.2.1", "trackgps_rasp1989", "Rodrigo2410$", "trackgpszulia");
 }
 
 
