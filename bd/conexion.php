@@ -1,12 +1,12 @@
 <?php 
-$mysqli = new mysqli("localhost", "trackgps_rasp1989", "Rodrigo2410$", "trackgpszulia");
+$mysqli = new mysqli("127.0.0.1", "trackgps_rasp1989", "Rodrigo2410$", "trackgpszulia");
 if ($mysqli->connect_error)
 {
 	die ('ERROR: No se establecio la conexion.'.mysqli_connect_error());
 }
 
  	# conectare la base de datos
-    $con=@mysqli_connect('localhost', 'trackgps_rasp1989', 'Rodrigo2410$', 'trackgpszulia');
+    $con=@mysqli_connect('127.0.0.1', 'trackgps_rasp1989', 'Rodrigo2410$', 'trackgpszulia');
 
     if(!$con){
         die("imposible conectar: ".mysqli_error($con));
