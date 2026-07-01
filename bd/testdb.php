@@ -3,8 +3,8 @@
 try {
 
     $pdo = new PDO(
-        "mysql:host=srv1056.hstgr.io;port=3306;dbname=u854084565_trackgpsz1;charset=utf8",
-        "u854084565_Rodri24",
+        "mysql:host=31.97.87.58;port=3306;dbname=trackgpszulia;charset=utf8",
+        "rasp1989",
         "Rodrigo2410$"
     );
 

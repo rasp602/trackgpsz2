@@ -7,17 +7,17 @@
 
 
 /* Creando una nueva conexión a la base de datos. */
-$conn = new mysqli("srv1056.hstgr.io", "u854084565_Rodri24", "Rodrigo2410$", "u854084565_trackgpsz1");
+$conn = new mysqli("31.97.87.58", "rasp1989", "Rodrigo2410$", "trackgpszulia");
 
 /* Comprobando si hay un error de conexión. */
 if ($conn->connect_error) {
     die('Error de conexion ' . $conn->connect_error);
 }
 
-$servername = "srv1056.hstgr.io";
-$username = "u854084565_Rodri24";
+$servername = "31.97.87.58";
+$username = "rasp1989";
 $password = "Rodrigo2410$";
-$dbname = "u854084565_trackgpsz1";
+$dbname = "trackgpszulia";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

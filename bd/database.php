@@ -8,9 +8,9 @@ class Database
     {
         try {
 
-            $host = "srv1056.hstgr.io";
-            $dbname = "u854084565_trackgpsz1";
-            $user = "u854084565_Rodri24";
+            $host = "31.97.87.58";
+            $dbname = "trackgpszulia";
+            $user = "rasp1989";
             $pass = "Rodrigo2410$";
 
             $pdo = new PDO("mysql:host=$host;port=3306;dbname=$dbname;charset=utf8", $user, $pass);
