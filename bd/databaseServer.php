@@ -6,7 +6,7 @@ class DatabaseLocal
     {
         try {
 
-            $host = "localhost";
+            $host = "127.0.0.1";
             $dbname = "trackgpszulia";
             $user = "trackgps_rasp1989";
             $pass = "Rodrigo2410$";
