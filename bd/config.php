@@ -7,7 +7,7 @@
 
 
 /* Creando una nueva conexión a la base de datos. */
-$conn = new mysqli("localhost", "rasp1989", "Rodrigo2410$", "trackgpszulia");
+$conn = new mysqli("localhost", "trackgps_rasp1989", "Rodrigo2410$", "trackgpszulia");
 
 /* Comprobando si hay un error de conexión. */
 if ($conn->connect_error) {
@@ -15,7 +15,7 @@ if ($conn->connect_error) {
 }
 
 $servername = "localhost";
-$username = "rasp1989";
+$username = "trackgps_rasp1989";
 $password = "Rodrigo2410$";
 $dbname = "trackgpszulia";
 

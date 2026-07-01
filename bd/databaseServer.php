@@ -8,7 +8,7 @@ class DatabaseLocal
 
             $host = "localhost";
             $dbname = "trackgpszulia";
-            $user = "rasp1989";
+            $user = "trackgps_rasp1989";
             $pass = "Rodrigo2410$";
 
             $pdo = new PDO("mysql:host=$host;port=3306;dbname=$dbname;charset=utf8", $user, $pass);
