@@ -7,14 +7,14 @@
 
 
 /* Creando una nueva conexión a la base de datos. */
-$conn = new mysqli("31.97.87.58", "rasp1989", "Rodrigo2410$", "trackgpszulia");
+$conn = new mysqli("localhost", "rasp1989", "Rodrigo2410$", "trackgpszulia");
 
 /* Comprobando si hay un error de conexión. */
 if ($conn->connect_error) {
     die('Error de conexion ' . $conn->connect_error);
 }
 
-$servername = "31.97.87.58";
+$servername = "localhost";
 $username = "rasp1989";
 $password = "Rodrigo2410$";
 $dbname = "trackgpszulia";
