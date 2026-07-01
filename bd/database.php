@@ -8,7 +8,7 @@ class Database
     {
         try {
 
-            $host = "127.0.0.1";
+            $host = "10.0.2.1";
             $dbname = "trackgpszulia";
             $user = "trackgps_rasp1989";
             $pass = "Rodrigo2410$";
