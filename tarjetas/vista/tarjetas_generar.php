@@ -334,7 +334,7 @@ $(document).ready(function(){
         console.log("Parámetros a enviar:", parametros);
 
         $.ajax({
-            url: '?c=Tarjetas&a=Guardar',
+            url: '?c=tarjetas&a=Guardar',
             type: 'POST',
             data: parametros,
             success: function(data){
