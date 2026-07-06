@@ -343,7 +343,7 @@ $controles = $this->ObtenerControlesPorVariante($data->idVariante);
 
 $horaProgramada = new DateTime($data->horaTarjeta);
 
-$sqlDetalle = "INSERT INTO detalleTarjeta
+$sqlDetalle = "INSERT INTO detalletarjeta
                (idTarjeta, idControl, horaProgramada, horaMarcada, diferenciaMinutos, toleranciaAsignada, valorPago)
                VALUES (?,?,?,?,?,?,?)";
 
