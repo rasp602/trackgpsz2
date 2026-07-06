@@ -35,7 +35,7 @@
         <div class="row">
             <!-- Formulario en el lado izquierdo -->
             <div class="col-md-4">
-                <form id="form1" action="index.php?c=Tarjetas&a=Registrar" name="form1" method="post" enctype="multipart/form-data" class="p-4 shadow rounded bg-light">
+                <form id="form1" action="index.php?c=Tarjetas&a=Guardar" name="form1" method="post" enctype="multipart/form-data" class="p-4 shadow rounded bg-light">
                     <h2 class="text-center mb-4">Generador de Tarjeta</h2>
 
                     <?php
@@ -337,8 +337,19 @@ $(document).ready(function(){
             url: '?c=tarjetas&a=Guardar',
             type: 'POST',
             data: parametros,
+            dataType: 'json',
             success: function(data){
                 console.log("Respuesta Guardar:", data);
+
+                if (!data || data.success !== true) {
+                    alert(data && data.message ? data.message : "No se pudo guardar la tarjeta.");
+                    btn.disabled = false;
+                    btn.innerHTML = "Generar";
+                    enviando = false;
+                    return;
+                }
+
+                parametros.idTarjeta = data.idTarjeta;
 
                 $.ajax({
                     url: '../../trackgpsz2/ticketTarjeta.php',
@@ -355,8 +366,15 @@ $(document).ready(function(){
                 });
             },
             error: function(xhr, status, error) {
-                console.log("Error en Guardar:", error);
-                alert("Hubo un error al guardar la tarjeta.");
+                console.log("Error en Guardar:", error, xhr.responseText);
+
+                let mensaje = "Hubo un error al guardar la tarjeta.";
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    mensaje = xhr.responseJSON.message;
+                }
+
+                alert(mensaje);
                 btn.disabled = false;
                 btn.innerHTML = "Generar";
                 enviando = false;

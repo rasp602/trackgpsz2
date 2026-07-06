@@ -392,7 +392,9 @@ $updateHoraFin->execute([
     } 
 catch (Exception $e) 
 {
-    $this->pdo->rollBack();
+    if ($this->pdo->inTransaction()) {
+        $this->pdo->rollBack();
+    }
     return [
         'error' => true,
         'mensaje' => $e->getMessage()
@@ -402,45 +404,44 @@ catch (Exception $e)
 
 
 public function ActualizarTarjeta($data)
-	{
-		try 
-		{
-			$sql = "UPDATE tarjeta SET 
-				  	fechaSalida = ?,
-				    horaTarjeta = ?,
-				    idBus = ?,
-					idVariante = ?,
-					idPersona = ?,
-					frecuenciaTarjeta = ?,
-					horaFin = ?,    
-					busDelantero = ?,
-                    busTraseroob = ?,
-			       WHERE idTarjeta = ?";
+{
+    try 
+    {
+        $sql = "UPDATE tarjeta SET 
+                    fechaSalida = ?,
+                    horaTarjeta = ?,
+                    idBus = ?,
+                    idVariante = ?,
+                    idPersona = ?,
+                    frecuenciaTarjeta = ?,
+                    horaFin = ?,
+                    busDelantero = ?,
+                    busTrasero = ?
+                WHERE idTarjeta = ?";
 
+        $stmt = $this->pdo->prepare($sql);
 
-			$this->pdo->prepare($sql)
-			     ->execute(
-				    array(
-                   $data->fechaSalida,
-                   $data->horaTarjeta,
-                   $data->idBus,
-                   $data->idVariante,
-				   $data->idPersona,
-				   $data->frecuenciaTarjeta,
-                   $data->horaFin,
-				   $data->busDelantero,
-				   $data->busTrasero,
-
-
-
-					)
-				);
-		} catch (Exception $e) 
-		{
-			die($e->getMessage());
-		}
-	}
-
+        return $stmt->execute([
+            $data->fechaSalida,
+            $data->horaTarjeta,
+            $data->idBus,
+            $data->idVariante,
+            $data->idPersona,
+            $data->frecuenciaTarjeta,
+            $data->horaFin,
+            $data->busDelantero,
+            $data->busTrasero,
+            $data->idTarjeta
+        ]);
+    } 
+    catch (Exception $e) 
+    {
+        return [
+            'error' => true,
+            'mensaje' => $e->getMessage()
+        ];
+    }
+}
 
 	public function Eliminar($idTarjeta)
 	{
@@ -610,23 +611,42 @@ public function ListarTarjetasPorFecha($fecha)
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 	
-public function ExisteTarjeta($fechaSalida, $horaTarjeta,$idVariante)
+public function ExisteTarjeta($fechaSalida, $horaTarjeta, $idBus = null, $idVariante = null)
 {
-    $sql = "SELECT 1
-            FROM tarjeta
-            WHERE fechaSalida = ?
-              AND horaTarjeta = ?
-              AND idVariante = ?
-            LIMIT 1";
+    /*
+     * Compatible con las 2 formas de uso del sistema:
+     *  - ExisteTarjeta($fecha, $hora, $idVariante)
+     *  - ExisteTarjeta($fecha, $hora, $idBus, $idVariante)
+     */
+    if ($idVariante === null) {
+        $idVariante = $idBus;
+        $idBus = null;
+    }
 
-    $stmt = $this->pdo->prepare($sql);
-    $stmt->execute([
-        $fechaSalida,
-        $horaTarjeta,
-        $idVariante
-    ]);
+    if ($idBus === null || $idBus === '' || (int)$idBus === 0) {
+        $sql = "SELECT 1
+                FROM tarjeta
+                WHERE fechaSalida = ?
+                  AND horaTarjeta = ?
+                  AND idVariante = ?
+                LIMIT 1";
 
-    return $stmt->fetch() ? true : false;
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$fechaSalida, $horaTarjeta, $idVariante]);
+    } else {
+        $sql = "SELECT 1
+                FROM tarjeta
+                WHERE fechaSalida = ?
+                  AND horaTarjeta = ?
+                  AND idBus = ?
+                  AND idVariante = ?
+                LIMIT 1";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$fechaSalida, $horaTarjeta, $idBus, $idVariante]);
+    }
+
+    return $stmt->fetchColumn() ? true : false;
 }
 
 
