@@ -26,7 +26,7 @@ try {
 while ($row = $result->fetch_assoc()) {
 
     // Verificar si tiene detalle
-    $stmtDetalle = $conn->prepare("SELECT COUNT(*) as total FROM detalleControl WHERE idControl = ?");
+    $stmtDetalle = $conn->prepare("SELECT COUNT(*) as total FROM detallecontrol WHERE idControl = ?");
     $stmtDetalle->bind_param("i", $row['idControl']);
     $stmtDetalle->execute();
     $resDetalle = $stmtDetalle->get_result();
