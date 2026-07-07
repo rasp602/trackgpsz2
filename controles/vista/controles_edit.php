@@ -106,7 +106,242 @@
                          <option value="I">IDA</option>
                          <option value="R">REGRESO</option>                       
                     </select>
-                  </div>                                    
+                  </div>  
+                  
+                  <button type="button" class="btn btn-info" onclick="abrirMapaGeocerca()">
+    Configurar Geocerca
+</button>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+<div class="modal fade" id="modalGeocerca" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl" role="document" style="max-width:95%;">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Configurar Geocerca del Control</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div id="mapaGeocerca" style="width:100%; height:70vh;"></div>
+
+                <div class="mt-3">
+                    <button type="button" class="btn btn-success" onclick="guardarGeocerca()">
+                        Guardar Geocerca
+                    </button>
+
+                    <button type="button" class="btn btn-warning" onclick="limpiarGeocerca()">
+                        Limpiar
+                    </button>
+
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let mapaGeocerca = null;
+let drawnItems = null;
+let drawControl = null;
+let poligonoActual = null;
+
+const idControlActual = document.getElementById('idControl').value;
+
+function abrirMapaGeocerca() {
+    $('#modalGeocerca').modal('show');
+
+    setTimeout(() => {
+        if (!mapaGeocerca) {
+            iniciarMapaGeocerca();
+        }
+
+        mapaGeocerca.invalidateSize();
+        cargarGeocercaExistente();
+    }, 400);
+}
+
+function iniciarMapaGeocerca() {
+    mapaGeocerca = L.map('mapaGeocerca').setView([-23.6509, -70.3975], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 20,
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(mapaGeocerca);
+
+    drawnItems = new L.FeatureGroup();
+    mapaGeocerca.addLayer(drawnItems);
+
+    drawControl = new L.Control.Draw({
+        draw: {
+            polygon: {
+                allowIntersection: false,
+                showArea: true,
+                shapeOptions: {
+                    color: '#2563eb',
+                    weight: 4
+                }
+            },
+            rectangle: {
+                shapeOptions: {
+                    color: '#16a34a',
+                    weight: 4
+                }
+            },
+            polyline: false,
+            circle: false,
+            circlemarker: false,
+            marker: false
+        },
+        edit: {
+            featureGroup: drawnItems,
+            remove: true
+        }
+    });
+
+    mapaGeocerca.addControl(drawControl);
+
+    mapaGeocerca.on(L.Draw.Event.CREATED, function (event) {
+        drawnItems.clearLayers();
+
+        poligonoActual = event.layer;
+        drawnItems.addLayer(poligonoActual);
+
+        centrarPoligono();
+    });
+
+    mapaGeocerca.on(L.Draw.Event.EDITED, function () {
+        const layers = drawnItems.getLayers();
+        poligonoActual = layers.length > 0 ? layers[0] : null;
+    });
+
+    mapaGeocerca.on(L.Draw.Event.DELETED, function () {
+        poligonoActual = null;
+    });
+}
+
+async function cargarGeocercaExistente() {
+    if (!idControlActual || idControlActual <= 0) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`?c=controles&a=ObtenerGeocerca&idControl=${idControlActual}`);
+        const json = await response.json();
+
+        if (!json.success || !json.data || json.data.length === 0) {
+            return;
+        }
+
+        drawnItems.clearLayers();
+
+        const puntos = json.data.map(p => [
+            parseFloat(p.latitud),
+            parseFloat(p.longitud)
+        ]);
+
+        poligonoActual = L.polygon(puntos, {
+            color: '#2563eb',
+            weight: 4,
+            fillOpacity: 0.25
+        });
+
+        drawnItems.addLayer(poligonoActual);
+        centrarPoligono();
+
+    } catch (error) {
+        console.error('Error cargando geocerca:', error);
+        alert('Error cargando geocerca existente');
+    }
+}
+
+function obtenerPuntosPoligono() {
+    if (!poligonoActual) {
+        return [];
+    }
+
+    let latLngs = poligonoActual.getLatLngs();
+
+    if (Array.isArray(latLngs[0])) {
+        latLngs = latLngs[0];
+    }
+
+    return latLngs.map(p => ({
+        lat: p.lat,
+        lng: p.lng
+    }));
+}
+
+async function guardarGeocerca() {
+    if (!idControlActual || idControlActual <= 0) {
+        alert('Primero debe guardar el control antes de configurar la geocerca.');
+        return;
+    }
+
+    const puntos = obtenerPuntosPoligono();
+
+    if (puntos.length < 3) {
+        alert('Debe dibujar un polígono con al menos 3 puntos.');
+        return;
+    }
+
+    try {
+        const response = await fetch('?c=controles&a=GuardarGeocerca', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                idControl: idControlActual,
+                puntos: puntos
+            })
+        });
+
+        const json = await response.json();
+
+        if (json.success) {
+            alert(json.message || 'Geocerca guardada correctamente');
+            $('#modalGeocerca').modal('hide');
+        } else {
+            alert(json.message || 'No se pudo guardar la geocerca');
+        }
+
+    } catch (error) {
+        console.error('Error guardando geocerca:', error);
+        alert('Error guardando geocerca');
+    }
+}
+
+function limpiarGeocerca() {
+    if (!drawnItems) return;
+
+    if (confirm('¿Seguro que desea borrar el polígono actual?')) {
+        drawnItems.clearLayers();
+        poligonoActual = null;
+    }
+}
+
+function centrarPoligono() {
+    if (!poligonoActual || !mapaGeocerca) return;
+
+    const bounds = poligonoActual.getBounds();
+
+    if (bounds.isValid()) {
+        mapaGeocerca.fitBounds(bounds, {
+            padding: [30, 30]
+        });
+    }
+}
+</script>
  
       <div id="mapa" style="height: 400px;"></div>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDV2KA_R534-_7ZGNn8MYKPzUHOAQiwlvI&callback=initMap"></script>

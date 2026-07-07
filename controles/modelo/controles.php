@@ -205,6 +205,66 @@ public function ActualizarControl($data)
 		}
 	}
 
+	public function ObtenerGeocerca($idControl)
+{
+    try {
+        $sql = "SELECT idGeocerca, idControl, orden, latitud, longitud
+                FROM control_geocerca
+                WHERE idControl = ?
+                ORDER BY orden ASC";
+
+        $stm = $this->pdo->prepare($sql);
+        $stm->execute([$idControl]);
+
+        return $stm->fetchAll(PDO::FETCH_OBJ);
+    } catch (Exception $e) {
+        die($e->getMessage());
+    }
+}
+
+public function GuardarGeocerca($idControl, $puntos)
+{
+    try {
+        $this->pdo->beginTransaction();
+
+        $delete = $this->pdo->prepare("DELETE FROM control_geocerca WHERE idControl = ?");
+        $delete->execute([$idControl]);
+
+        $insert = $this->pdo->prepare("
+            INSERT INTO control_geocerca
+            (idControl, orden, latitud, longitud)
+            VALUES (?, ?, ?, ?)
+        ");
+
+        $orden = 1;
+
+        foreach ($puntos as $punto) {
+            $lat = isset($punto['lat']) ? $punto['lat'] : null;
+            $lng = isset($punto['lng']) ? $punto['lng'] : null;
+
+            if ($lat === null || $lng === null) {
+                continue;
+            }
+
+            $insert->execute([
+                $idControl,
+                $orden,
+                $lat,
+                $lng
+            ]);
+
+            $orden++;
+        }
+
+        $this->pdo->commit();
+
+        return true;
+    } catch (Exception $e) {
+        $this->pdo->rollBack();
+        throw $e;
+    }
+}
+
 }
 
 

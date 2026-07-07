@@ -120,7 +120,77 @@ class ControlesController{
         header('Location: ?c=controles&a=menuControles&delete=1');
     }
 
+public function ObtenerGeocerca()
+{
+    header('Content-Type: application/json; charset=utf-8');
 
+    $idControl = isset($_GET['idControl']) ? intval($_GET['idControl']) : 0;
+
+    if ($idControl <= 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'ID de control inválido',
+            'data' => []
+        ]);
+        return;
+    }
+
+    try {
+        $data = $this->model->ObtenerGeocerca($idControl);
+
+        echo json_encode([
+            'success' => true,
+            'data' => $data
+        ], JSON_UNESCAPED_UNICODE);
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => false,
+            'message' => $e->getMessage(),
+            'data' => []
+        ]);
+    }
+}
+
+public function GuardarGeocerca()
+{
+    header('Content-Type: application/json; charset=utf-8');
+
+    $raw = file_get_contents('php://input');
+    $json = json_decode($raw, true);
+
+    $idControl = isset($json['idControl']) ? intval($json['idControl']) : 0;
+    $puntos = isset($json['puntos']) ? $json['puntos'] : [];
+
+    if ($idControl <= 0) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'ID de control inválido'
+        ]);
+        return;
+    }
+
+    if (!is_array($puntos) || count($puntos) < 3) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Debe dibujar al menos 3 puntos para formar el polígono'
+        ]);
+        return;
+    }
+
+    try {
+        $this->model->GuardarGeocerca($idControl, $puntos);
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Geocerca guardada correctamente'
+        ], JSON_UNESCAPED_UNICODE);
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+}
 
 
 
