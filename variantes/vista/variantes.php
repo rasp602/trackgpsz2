@@ -214,82 +214,127 @@
 
 <!--EDITOR DE RUTA-->
 <script>
-    function abrirModalEditar(idVariante){
+<script>
+function mostrarModalRuta() {
+    const modal = document.getElementById('modalRuta');
+
+    // Bootstrap 4 / AdminLTE
+    if (window.jQuery && typeof $('#modalRuta').modal === 'function') {
+        $('#modalRuta').modal('show');
+        return;
+    }
+
+    // Bootstrap 5
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const instancia = bootstrap.Modal.getOrCreateInstance(modal);
+        instancia.show();
+        return;
+    }
+
+    alert("No se pudo abrir el modal: Bootstrap no está cargado correctamente.");
+}
+
+function abrirModalEditar(idVariante) {
+
+    if (!idVariante) {
+        alert("No llegó el ID de la variante.");
+        return;
+    }
 
     document.getElementById("ruta_idVariante").value = idVariante;
     document.querySelector("#tablaEditarControles tbody").innerHTML = "";
 
-    fetch("variantes/vista/obtener_ruta.php?idVariante=" + idVariante)
-    .then(res => res.json())
-    .then(data => {
+    fetch("variantes/vista/obtener_ruta.php?idVariante=" + encodeURIComponent(idVariante))
+        .then(res => res.text())
+        .then(texto => {
 
-        data.forEach(row => {
-        let icono = row.tieneDetalle == 1 ? "🟢" : "➕";
-        let claseBtn = row.tieneDetalle == 1 ? "btn-success" : "btn-info";
-            let fila = `
-                <tr data-idRuta="${row.idRuta}">
-                    <td>
-                        <input type="number" class="form-control" value="${row.posicion}">
-                    </td>
+            let data;
 
-                    <td>
-                        <select class="form-control">
-                            ${row.selectControl}
-                        </select>
-                    </td>
+            try {
+                data = JSON.parse(texto);
+            } catch (e) {
+                console.error("Respuesta NO JSON de obtener_ruta.php:", texto);
+                alert("Error en obtener_ruta.php. Revisa la consola F12.");
+                return;
+            }
 
-                    <td>
-                        <div class="d-flex">
-                            <input type="number" class="form-control minutos-input" value="${row.minutos}">
-                        <button type="button"
-                            class="btn ${claseBtn} btn-sm ml-1"
-                            onclick="abrirDetalleMinutos(this)">
-                        ${icono}
-                    </button>
-                        </div>
-                    </td>
+            if (!Array.isArray(data)) {
+                console.error("Respuesta inesperada:", data);
+                alert("obtener_ruta.php no devolvió una lista válida.");
+                return;
+            }
 
-                    <td>
-                        <input type="number" class="form-control" value="${row.tolerancia}">
-                    </td>
+            data.forEach(row => {
 
-                    <td>
-                        <select class="form-control">
-                            <option value="LABORAL" ${row.tipoDias == 'LABORAL' ? 'selected' : ''}>LABORAL</option>
-                            <option value="SABADO" ${row.tipoDias == 'SABADO' ? 'selected' : ''}>SÁBADO</option>
-                            <option value="DOMINGO" ${row.tipoDias == 'DOMINGO' ? 'selected' : ''}>DOMINGO</option>
-                            <option value="FESTIVO" ${row.tipoDias == 'FESTIVO' ? 'selected' : ''}>FESTIVO</option>
-                        </select>
-                    </td>
+                let icono = row.tieneDetalle == 1 ? "🟢" : "➕";
+                let claseBtn = row.tieneDetalle == 1 ? "btn-success" : "btn-info";
 
-                    <td>
-                        <input type="number" class="form-control" value="${row.anguloE}">
-                    </td>
+                let fila = `
+                    <tr data-idRuta="${row.idRuta}">
+                        <td>
+                            <input type="number" class="form-control" value="${row.posicion ?? ''}">
+                        </td>
 
-                    <td>
-                        <input type="number" class="form-control" value="${row.anguloS}">
-                    </td>
+                        <td>
+                            <select class="form-control">
+                                ${row.selectControl ?? ''}
+                            </select>
+                        </td>
 
-                    <td>
-                        <input type="number" class="form-control" value="${row.multaAtraso}">
-                    </td>
+                        <td>
+                            <div class="d-flex">
+                                <input type="number" class="form-control minutos-input" value="${row.minutos ?? ''}">
+                                <button type="button"
+                                        class="btn ${claseBtn} btn-sm ml-1"
+                                        onclick="abrirDetalleMinutos(this)">
+                                    ${icono}
+                                </button>
+                            </div>
+                        </td>
 
-                    <td>
-                        <button class="btn btn-danger" onclick="this.closest('tr').remove()">X</button>
-                    </td>
-                </tr>
-            `;
+                        <td>
+                            <input type="number" class="form-control" value="${row.tolerancia ?? ''}">
+                        </td>
 
-            document.querySelector("#tablaEditarControles tbody")
-            .insertAdjacentHTML("beforeend", fila);
+                        <td>
+                            <select class="form-control">
+                                <option value="LABORAL" ${row.tipoDias == 'LABORAL' ? 'selected' : ''}>LABORAL</option>
+                                <option value="SABADO" ${row.tipoDias == 'SABADO' ? 'selected' : ''}>SÁBADO</option>
+                                <option value="DOMINGO" ${row.tipoDias == 'DOMINGO' ? 'selected' : ''}>DOMINGO</option>
+                                <option value="FESTIVO" ${row.tipoDias == 'FESTIVO' ? 'selected' : ''}>FESTIVO</option>
+                            </select>
+                        </td>
+
+                        <td>
+                            <input type="number" class="form-control" value="${row.anguloE ?? ''}">
+                        </td>
+
+                        <td>
+                            <input type="number" class="form-control" value="${row.anguloS ?? ''}">
+                        </td>
+
+                        <td>
+                            <input type="number" class="form-control" value="${row.multaAtraso ?? ''}">
+                        </td>
+
+                        <td>
+                            <button type="button" class="btn btn-danger" onclick="this.closest('tr').remove()">X</button>
+                        </td>
+                    </tr>
+                `;
+
+                document.querySelector("#tablaEditarControles tbody")
+                    .insertAdjacentHTML("beforeend", fila);
+            });
+
+            mostrarModalRuta();
+        })
+        .catch(error => {
+            console.error("Error en fetch:", error);
+            alert("Error cargando la ruta. Revisa F12 > Console.");
         });
-
-        $('#modalRuta').modal('show');
-    })
-    .catch(error => {
-        console.error("Error en fetch:", error);
-    });
 }
+</script>
 </script>
 <!--AGREGAR FILA EN EDITOR DE RUTA-->
 <script>
