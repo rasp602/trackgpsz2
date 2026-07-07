@@ -214,7 +214,7 @@
 
 <!--EDITOR DE RUTA-->
 <script>
-<script>
+
 function mostrarModalRuta() {
     const modal = document.getElementById('modalRuta');
 
@@ -334,7 +334,7 @@ function abrirModalEditar(idVariante) {
             alert("Error cargando la ruta. Revisa F12 > Console.");
         });
 }
-</script>
+
 </script>
 <!--AGREGAR FILA EN EDITOR DE RUTA-->
 <script>
