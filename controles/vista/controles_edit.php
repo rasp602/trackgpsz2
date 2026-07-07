@@ -10,6 +10,12 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
 
 
   <?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>   
@@ -111,13 +117,6 @@
                   <button type="button" class="btn btn-info" onclick="abrirMapaGeocerca()">
     Configurar Geocerca
 </button>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-
 <div class="modal fade" id="modalGeocerca" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-xl" role="document" style="max-width:95%;">
         <div class="modal-content">
@@ -148,8 +147,140 @@
         </div>
     </div>
 </div>
+ 
+      <div id="mapa" style="height: 400px;"></div>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDV2KA_R534-_7ZGNn8MYKPzUHOAQiwlvI&callback=initMap"></script>
 
-<script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>var map = L.map('mapa').setView([-23.6467,-70.3976], 13);
+
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);</script>
+
+                  <div class="form-group">             
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                    <input type="button" id="cancelar" class="btn btn-danger" name="Cancelar" value="Cancelar" onClick="location.href='?c=menu_principal&a=menu_usuarios'">
+                  </div>                 
+                </div>
+              </div>              
+                <!-- /.card-body -->
+
+
+              </form>
+            </div>
+
+
+            </div>
+            
+        </div>
+   </div>    
+   </div>    
+<br>
+   </div> 
+ <script>
+    function numeros(e){
+    key = e.keyCode || e.which;
+    tecla = String.fromCharCode(key).toLowerCase();
+    letras = " 0123456789";
+    especiales = [9,13,8,37,39,46,38,46,164];
+ 
+    tecla_especial = false
+    for(var i in especiales){
+ if(key == especiales[i]){
+     tecla_especial = true;
+     break;
+        } 
+    }
+ 
+    if(letras.indexOf(tecla)==-1 && !tecla_especial)
+        return false;
+}
+    </script>
+
+
+
+      <script>
+       
+       function sololetras(e){
+           key= e.keyCode || e.which;
+           teclado= String .fromCharCode(key).toLowerCase();
+           letras="abcdefghijklmnñopqrstuvwxyz"
+           especiales="13-9-8-37-38-46-164";
+           
+           teclado_especial=false;
+           
+           for(var i in especiales){
+               
+               if(key==especiales[i]){
+                   teclado_especial=true;break;
+                   
+                   }
+               }
+           if(letras.indexOf(teclado)==-1 && !teclado_especial){
+               
+               return false;
+               
+               }
+           
+           }
+       
+       
+       </script> 
+
+ <script>
+       
+function checkRut(rut) {
+    // Despejar Puntos
+    var valor = rut.value.replace('.','');
+    // Despejar Guión
+    valor = valor.replace('-','');
+    
+    // Aislar Cuerpo y Dígito Verificador
+    cuerpo = valor.slice(0,-1);
+    dv = valor.slice(-1).toUpperCase();
+    
+    // Formatear RUN
+    rut.value = cuerpo + '-'+ dv
+    
+    // Si no cumple con el mínimo ej. (n.nnn.nnn)
+    if(cuerpo.length < 7) { rut.setCustomValidity("RUT Incompleto"); return false;}
+    
+    // Calcular Dígito Verificador
+    suma = 0;
+    multiplo = 2;
+    
+    // Para cada dígito del Cuerpo
+    for(i=1;i<=cuerpo.length;i++) {
+    
+        // Obtener su Producto con el Múltiplo Correspondiente
+        index = multiplo * valor.charAt(cuerpo.length - i);
+        
+        // Sumar al Contador General
+        suma = suma + index;
+        
+        // Consolidar Múltiplo dentro del rango [2,7]
+        if(multiplo < 7) { multiplo = multiplo + 1; } else { multiplo = 2; }
+  
+    }
+    
+    // Calcular Dígito Verificador en base al Módulo 11
+    dvEsperado = 11 - (suma % 11);
+    
+    // Casos Especiales (0 y K)
+    dv = (dv == 'K')?10:dv;
+    dv = (dv == 0)?11:dv;
+    
+    // Validar que el Cuerpo coincide con su Dígito Verificador
+    if(dvEsperado != dv) { rut.setCustomValidity("RUT Inválido"); return false; }
+    
+    // Si todo sale bien, eliminar errores (decretar que es válido)
+    rut.setCustomValidity('');
+}
+       
+       </script> <script>
 let mapaGeocerca = null;
 let drawnItems = null;
 let drawControl = null;
@@ -342,137 +473,3 @@ function centrarPoligono() {
     }
 }
 </script>
- 
-      <div id="mapa" style="height: 400px;"></div>
-   
-
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-<script>var map = L.map('mapa').setView([-23.6467,-70.3976], 13);
-
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);</script>
-
-                  <div class="form-group">             
-                    <button type="submit" class="btn btn-primary">Registrar</button>
-                    <input type="button" id="cancelar" class="btn btn-danger" name="Cancelar" value="Cancelar" onClick="location.href='?c=menu_principal&a=menu_usuarios'">
-                  </div>                 
-                </div>
-              </div>              
-                <!-- /.card-body -->
-
-
-              </form>
-            </div>
-
-
-            </div>
-            
-        </div>
-   </div>    
-   </div>    
-<br>
-   </div> 
- <script>
-    function numeros(e){
-    key = e.keyCode || e.which;
-    tecla = String.fromCharCode(key).toLowerCase();
-    letras = " 0123456789";
-    especiales = [9,13,8,37,39,46,38,46,164];
- 
-    tecla_especial = false
-    for(var i in especiales){
- if(key == especiales[i]){
-     tecla_especial = true;
-     break;
-        } 
-    }
- 
-    if(letras.indexOf(tecla)==-1 && !tecla_especial)
-        return false;
-}
-    </script>
-
-
-
-      <script>
-       
-       function sololetras(e){
-           key= e.keyCode || e.which;
-           teclado= String .fromCharCode(key).toLowerCase();
-           letras="abcdefghijklmnñopqrstuvwxyz"
-           especiales="13-9-8-37-38-46-164";
-           
-           teclado_especial=false;
-           
-           for(var i in especiales){
-               
-               if(key==especiales[i]){
-                   teclado_especial=true;break;
-                   
-                   }
-               }
-           if(letras.indexOf(teclado)==-1 && !teclado_especial){
-               
-               return false;
-               
-               }
-           
-           }
-       
-       
-       </script> 
-
- <script>
-       
-function checkRut(rut) {
-    // Despejar Puntos
-    var valor = rut.value.replace('.','');
-    // Despejar Guión
-    valor = valor.replace('-','');
-    
-    // Aislar Cuerpo y Dígito Verificador
-    cuerpo = valor.slice(0,-1);
-    dv = valor.slice(-1).toUpperCase();
-    
-    // Formatear RUN
-    rut.value = cuerpo + '-'+ dv
-    
-    // Si no cumple con el mínimo ej. (n.nnn.nnn)
-    if(cuerpo.length < 7) { rut.setCustomValidity("RUT Incompleto"); return false;}
-    
-    // Calcular Dígito Verificador
-    suma = 0;
-    multiplo = 2;
-    
-    // Para cada dígito del Cuerpo
-    for(i=1;i<=cuerpo.length;i++) {
-    
-        // Obtener su Producto con el Múltiplo Correspondiente
-        index = multiplo * valor.charAt(cuerpo.length - i);
-        
-        // Sumar al Contador General
-        suma = suma + index;
-        
-        // Consolidar Múltiplo dentro del rango [2,7]
-        if(multiplo < 7) { multiplo = multiplo + 1; } else { multiplo = 2; }
-  
-    }
-    
-    // Calcular Dígito Verificador en base al Módulo 11
-    dvEsperado = 11 - (suma % 11);
-    
-    // Casos Especiales (0 y K)
-    dv = (dv == 'K')?10:dv;
-    dv = (dv == 0)?11:dv;
-    
-    // Validar que el Cuerpo coincide con su Dígito Verificador
-    if(dvEsperado != dv) { rut.setCustomValidity("RUT Inválido"); return false; }
-    
-    // Si todo sale bien, eliminar errores (decretar que es válido)
-    rut.setCustomValidity('');
-}
-       
-       </script> 
