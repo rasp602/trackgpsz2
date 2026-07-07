@@ -344,7 +344,7 @@ function centrarPoligono() {
 </script>
  
       <div id="mapa" style="height: 400px;"></div>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDV2KA_R534-_7ZGNn8MYKPzUHOAQiwlvI&callback=initMap"></script>
+   
 
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
