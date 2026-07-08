@@ -50,7 +50,7 @@
 <body class="hold-transition sidebar-mini layout-fixed">
     <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="http://code.jquery.com/jquery-latest.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <script src="js/bootstrap.js"></script>
         <script src="js/bootstrap.min.js"></script>
