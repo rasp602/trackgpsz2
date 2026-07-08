@@ -4,7 +4,7 @@ error_reporting(E_ERROR | E_PARSE);
 
 <script>
 window.initMap = function () {
-	console.log('Google Maps callback cargado');
+	console.log('Google Maps callback desactivado');
 };
 </script>
 
@@ -18,6 +18,10 @@ window.initMap = function () {
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+<?php
+include 'bd/config.php';
+?>
 
 <?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>
 
@@ -40,7 +44,7 @@ if (isset($_GET["repetido"])) {
 	<div class="row">
 		<div class="col-md-12">
 
-			<h2 align="center" class="titulos">Nuevo Control</h2>
+			<h2 align="center" class="titulos">Editar Control</h2>
 
 			<div class="card card-primary">
 				<div class="card-header">
@@ -108,7 +112,7 @@ if (isset($_GET["repetido"])) {
 								<label>Tolerancia Entrada</label>
 								<input type="text" class="form-control" id="toleraciaEntrada" name="toleraciaEntrada"
 									value="<?php echo $vte->toleraciaEntrada; ?>"
-									placeholder="Ingresa la tolerancia"
+									placeholder="Ingresa la Tolerancia"
 									onkeypress="return numeros(event)">
 							</div>
 
@@ -144,10 +148,22 @@ if (isset($_GET["repetido"])) {
 
 							<div class="form-group">
 								<label>Sentido:</label>
-								<select name="sentido" id="sentido" class="form-control">
-									<option value="I" <?php echo ($vte->sentido == 'I') ? 'selected' : ''; ?>>IDA</option>
-									<option value="R" <?php echo ($vte->sentido == 'R') ? 'selected' : ''; ?>>REGRESO</option>
+								<select name="sentido" id="sentido" class="form-control input-md">
+									<?php
+									$sql_sentido = "SELECT DISTINCT sentido FROM controles";
+									$result_sentido = $conn->query($sql_sentido);
+
+									while ($row = $result_sentido->fetch_assoc()) {
+										$selected = ($row['sentido'] == $vte->sentido) ? 'selected' : '';
+										echo "<option value='{$row['sentido']}' $selected>{$row['sentido']}</option>";
+									}
+									?>
 								</select>
+							</div>
+
+							<div class="form-group">
+								<label>Mapa de referencia</label>
+								<div id="mapaPreview" style="height: 300px; border:1px solid #ddd; border-radius:8px;"></div>
 							</div>
 
 							<div class="form-group">
@@ -157,7 +173,7 @@ if (isset($_GET["repetido"])) {
 							</div>
 
 							<div class="form-group">
-								<button type="submit" class="btn btn-primary">Registrar</button>
+								<button type="submit" class="btn btn-primary">Actualizar</button>
 
 								<input type="button" id="cancelar" class="btn btn-danger" name="Cancelar"
 									value="Cancelar"
@@ -179,7 +195,10 @@ if (isset($_GET["repetido"])) {
 		<div class="modal-content">
 
 			<div class="modal-header bg-primary text-white">
-				<h5 class="modal-title">Configurar Geocerca del Control</h5>
+				<h5 class="modal-title">
+					Configurar Geocerca del Control:
+					<strong><?php echo $vte->nombreControl; ?></strong>
+				</h5>
 
 				<button type="button" class="close text-white" data-dismiss="modal">
 					<span>&times;</span>
@@ -213,10 +232,83 @@ if (isset($_GET["repetido"])) {
 </div>
 
 <script>
+let mapaPreview = null;
 let mapaGeocerca = null;
 let drawnItems = null;
 let drawControl = null;
 let poligonoActual = null;
+
+document.addEventListener('DOMContentLoaded', function () {
+	iniciarMapaPreview();
+});
+
+function iniciarMapaPreview() {
+	if (typeof L === 'undefined') {
+		console.error('Leaflet no cargó');
+		return;
+	}
+
+	const lat1 = parseFloat(document.getElementById('latitud1').value);
+	const lat2 = parseFloat(document.getElementById('latitud2').value);
+	const lng1 = parseFloat(document.getElementById('longitud1').value);
+	const lng2 = parseFloat(document.getElementById('longitud2').value);
+
+	let centerLat = -23.6467;
+	let centerLng = -70.3976;
+	let initialZoom = 13;
+
+	if (!isNaN(lat1) && !isNaN(lat2) && !isNaN(lng1) && !isNaN(lng2)) {
+		centerLat = (lat1 + lat2) / 2;
+		centerLng = (lng1 + lng2) / 2;
+		initialZoom = 16;
+	}
+
+	mapaPreview = L.map('mapaPreview').setView([centerLat, centerLng], initialZoom);
+
+	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 20,
+		attribution: '&copy; OpenStreetMap contributors'
+	}).addTo(mapaPreview);
+
+	cargarGeocercaPreview();
+}
+
+async function cargarGeocercaPreview() {
+	const idControlActual = obtenerIdControl();
+
+	if (!idControlActual || idControlActual <= 0 || !mapaPreview) {
+		return;
+	}
+
+	try {
+		const response = await fetch('?c=controles&a=ObtenerGeocerca&idControl=' + encodeURIComponent(idControlActual));
+		const json = await response.json();
+
+		if (!json.success || !json.data || json.data.length === 0) {
+			return;
+		}
+
+		const puntos = json.data.map(function (p) {
+			return [
+				parseFloat(p.latitud),
+				parseFloat(p.longitud)
+			];
+		});
+
+		const polygon = L.polygon(puntos, {
+			color: '#2563eb',
+			weight: 4,
+			fillOpacity: 0.25
+		}).addTo(mapaPreview);
+
+		mapaPreview.fitBounds(polygon.getBounds(), {
+			padding: [20, 20]
+		});
+
+	} catch (error) {
+		console.error('Error cargando preview de geocerca:', error);
+	}
+}
 
 function abrirMapaGeocerca() {
 	const idControlActual = obtenerIdControl();
@@ -249,7 +341,22 @@ function iniciarMapaGeocerca() {
 		return;
 	}
 
-	mapaGeocerca = L.map('mapaGeocerca').setView([-23.6467, -70.3976], 14);
+	const lat1 = parseFloat(document.getElementById('latitud1').value);
+	const lat2 = parseFloat(document.getElementById('latitud2').value);
+	const lng1 = parseFloat(document.getElementById('longitud1').value);
+	const lng2 = parseFloat(document.getElementById('longitud2').value);
+
+	let centerLat = -23.6467;
+	let centerLng = -70.3976;
+	let initialZoom = 14;
+
+	if (!isNaN(lat1) && !isNaN(lat2) && !isNaN(lng1) && !isNaN(lng2)) {
+		centerLat = (lat1 + lat2) / 2;
+		centerLng = (lng1 + lng2) / 2;
+		initialZoom = 16;
+	}
+
+	mapaGeocerca = L.map('mapaGeocerca').setView([centerLat, centerLng], initialZoom);
 
 	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 20,
@@ -315,7 +422,7 @@ function iniciarMapaGeocerca() {
 async function cargarGeocercaExistente() {
 	const idControlActual = obtenerIdControl();
 
-	if (!idControlActual || idControlActual <= 0) {
+	if (!idControlActual || idControlActual <= 0 || !drawnItems) {
 		return;
 	}
 
@@ -405,6 +512,17 @@ async function guardarGeocerca() {
 		if (json.success) {
 			alert(json.message || 'Geocerca guardada correctamente');
 			$('#modalGeocerca').modal('hide');
+
+			if (mapaPreview) {
+				mapaPreview.eachLayer(function (layer) {
+					if (layer instanceof L.Polygon) {
+						mapaPreview.removeLayer(layer);
+					}
+				});
+
+				cargarGeocercaPreview();
+			}
+
 		} else {
 			alert(json.message || 'No se pudo guardar la geocerca');
 		}
@@ -441,8 +559,8 @@ function actualizarCamposCoordenadasDesdePoligono() {
 
 	if (puntos.length === 0) return;
 
-	let latitudes = puntos.map(function (p) { return p.lat; });
-	let longitudes = puntos.map(function (p) { return p.lng; });
+	const latitudes = puntos.map(function (p) { return p.lat; });
+	const longitudes = puntos.map(function (p) { return p.lng; });
 
 	document.getElementById('latitud1').value = Math.min.apply(null, latitudes).toFixed(7);
 	document.getElementById('latitud2').value = Math.max.apply(null, latitudes).toFixed(7);
@@ -499,5 +617,46 @@ function sololetras(e) {
 	if (letras.indexOf(teclado) == -1 && !teclado_especial) {
 		return false;
 	}
+}
+
+function checkRut(rut) {
+	var valor = rut.value.replace('.', '');
+	valor = valor.replace('-', '');
+
+	cuerpo = valor.slice(0, -1);
+	dv = valor.slice(-1).toUpperCase();
+
+	rut.value = cuerpo + '-' + dv;
+
+	if (cuerpo.length < 7) {
+		rut.setCustomValidity("RUT Incompleto");
+		return false;
+	}
+
+	suma = 0;
+	multiplo = 2;
+
+	for (i = 1; i <= cuerpo.length; i++) {
+		index = multiplo * valor.charAt(cuerpo.length - i);
+		suma = suma + index;
+
+		if (multiplo < 7) {
+			multiplo = multiplo + 1;
+		} else {
+			multiplo = 2;
+		}
+	}
+
+	dvEsperado = 11 - (suma % 11);
+
+	dv = (dv == 'K') ? 10 : dv;
+	dv = (dv == 0) ? 11 : dv;
+
+	if (dvEsperado != dv) {
+		rut.setCustomValidity("RUT Inválido");
+		return false;
+	}
+
+	rut.setCustomValidity('');
 }
 </script>
