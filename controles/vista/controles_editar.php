@@ -167,7 +167,7 @@ if (isset($_GET["repetido"])) {
 							</div>
 
 							<div class="form-group">
-					<button type="button" class="btn btn-info" onclick="abrirMapaGeocerca(); return false;">
+			<button type="button" class="btn btn-info" onclick="abrirMapaGeocerca(); return false;">
 	Configurar Geocerca
 </button>
 							</div>
@@ -349,18 +349,6 @@ function abrirMapaGeocerca() {
 			cargarGeocercaExistente();
 		}
 	}, 600);
-}
-
-	$('#modalGeocerca').modal('show');
-
-	setTimeout(function () {
-		if (!mapaGeocerca) {
-			iniciarMapaGeocerca();
-		}
-
-		mapaGeocerca.invalidateSize();
-		cargarGeocercaExistente();
-	}, 500);
 }
 
 function iniciarMapaGeocerca() {
