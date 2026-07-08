@@ -167,9 +167,9 @@ if (isset($_GET["repetido"])) {
 							</div>
 
 							<div class="form-group">
-								<button type="button" class="btn btn-info" onclick="abrirMapaGeocerca()">
-									Configurar Geocerca
-								</button>
+					<button type="button" class="btn btn-info" onclick="abrirMapaGeocerca(); return false;">
+	Configurar Geocerca
+</button>
 							</div>
 
 							<div class="form-group">
@@ -314,9 +314,42 @@ function abrirMapaGeocerca() {
 	const idControlActual = obtenerIdControl();
 
 	if (!idControlActual || idControlActual <= 0) {
-		alert('Primero debe guardar el control antes de configurar la geocerca.');
+		alert('No se encontró idControl. Este control debe estar guardado antes de crear la geocerca.');
 		return;
 	}
+
+	const modal = document.getElementById('modalGeocerca');
+
+	if (!modal) {
+		alert('No existe el modal modalGeocerca en la vista.');
+		return;
+	}
+
+	// Bootstrap 5
+	if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+		const modalInstance = new bootstrap.Modal(modal);
+		modalInstance.show();
+	} 
+	// Bootstrap 3 / 4 con jQuery
+	else if (typeof $ !== 'undefined' && typeof $('#modalGeocerca').modal === 'function') {
+		$('#modalGeocerca').modal('show');
+	} 
+	else {
+		alert('Bootstrap Modal no está cargado correctamente.');
+		return;
+	}
+
+	setTimeout(function () {
+		if (!mapaGeocerca) {
+			iniciarMapaGeocerca();
+		}
+
+		if (mapaGeocerca) {
+			mapaGeocerca.invalidateSize();
+			cargarGeocercaExistente();
+		}
+	}, 600);
+}
 
 	$('#modalGeocerca').modal('show');
 
