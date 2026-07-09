@@ -192,6 +192,34 @@ public function GuardarGeocerca()
     }
 }
 
+public function ListarGeocercas()
+{
+    header('Content-Type: application/json; charset=utf-8');
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        exit;
+    }
+
+    try {
+        $data = $this->model->ListarGeocercas();
+
+        echo json_encode([
+            'success' => true,
+            'data' => $data
+        ], JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
+
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => false,
+            'message' => $e->getMessage(),
+            'data' => []
+        ], JSON_UNESCAPED_UNICODE);
+    }
+}
+
 
 
 }

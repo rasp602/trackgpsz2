@@ -83,21 +83,21 @@ class Controles
 		}
 	}
 
-		public function ObtenerNombreControl($NombreControl)
-	{
-		try 
-		{
-	$stm = $this->pdo->prepare("SELECT * FROM controles
-        WHERE nombreControl = ?;");
-			          
-			$stm->execute(array($nombreControl));
-			return $stm->fetch(PDO::FETCH_OBJ);
+public function ObtenerNombreControl($nombreControl)
+{
+    try {
+        $stm = $this->pdo->prepare("
+            SELECT * FROM controles
+            WHERE nombreControl = ?
+        ");
 
-		} catch (Exception $e) 
-		{
-			die($e->getMessage());
-		}
-	}
+        $stm->execute([$nombreControl]);
+        return $stm->fetch(PDO::FETCH_OBJ);
+
+    } catch (Exception $e) {
+        die($e->getMessage());
+    }
+}
 
 
 	public function Registrar(Controles $data)
@@ -262,6 +262,66 @@ public function GuardarGeocerca($idControl, $puntos)
     } catch (Exception $e) {
         $this->pdo->rollBack();
         throw $e;
+    }
+}
+
+public function ListarGeocercas()
+{
+    try {
+        $sql = "
+            SELECT 
+                c.idControl,
+                c.nombreControl,
+                c.abreviacionControl,
+                c.tipoControl,
+                c.sentido,
+                c.velMax,
+                c.estadoControl,
+                c.visible,
+                g.orden,
+                g.latitud,
+                g.longitud
+            FROM controles c
+            INNER JOIN control_geocerca g ON c.idControl = g.idControl
+            WHERE c.estadoControl = 'A'
+            ORDER BY c.idControl ASC, g.orden ASC
+        ";
+
+        $stm = $this->pdo->prepare($sql);
+        $stm->execute();
+
+        $rows = $stm->fetchAll(PDO::FETCH_OBJ);
+
+        $controles = [];
+
+        foreach ($rows as $row) {
+            $id = $row->idControl;
+
+            if (!isset($controles[$id])) {
+                $controles[$id] = [
+                    'idControl' => (int)$row->idControl,
+                    'nombreControl' => $row->nombreControl,
+                    'abreviacionControl' => $row->abreviacionControl,
+                    'tipoControl' => $row->tipoControl,
+                    'sentido' => $row->sentido,
+                    'velMax' => (float)$row->velMax,
+                    'estadoControl' => $row->estadoControl,
+                    'visible' => (int)$row->visible,
+                    'color' => $row->sentido === 'R' ? '#dc2626' : '#2563eb',
+                    'coordinates' => []
+                ];
+            }
+
+            $controles[$id]['coordinates'][] = [
+                (float)$row->latitud,
+                (float)$row->longitud
+            ];
+        }
+
+        return array_values($controles);
+
+    } catch (Exception $e) {
+        die($e->getMessage());
     }
 }
 
