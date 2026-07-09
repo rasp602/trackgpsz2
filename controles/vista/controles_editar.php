@@ -19,10 +19,7 @@ window.initMap = function () {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 
-<?php
-include 'bd/config.php';
-?>
-
+<?php include 'bd/config.php'; ?>
 <?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>
 
 <?php
@@ -32,13 +29,109 @@ if (isset($_SESSION['usuario'])) {
 	$usuario = $_SESSION['usuario'];
 	$cliente = $usuario->id_user;
 }
-?>
 
-<?php
 if (isset($_GET["repetido"])) {
 	echo '<div class="alert alert-warning" role="alert">El Bus que intenta ingresar ya se encuentra registrado...</div>';
 }
 ?>
+
+<style>
+	.geo-modal {
+		display: none;
+		position: fixed;
+		z-index: 999999;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.65);
+	}
+
+	.geo-modal-content {
+		background: white;
+		width: 95%;
+		height: 92%;
+		margin: 2% auto;
+		border-radius: 8px;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.geo-modal-header {
+		background: #007bff;
+		color: white;
+		padding: 12px 16px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.geo-modal-header h3 {
+		margin: 0;
+		font-size: 18px;
+	}
+
+	.geo-modal-header button {
+		background: transparent;
+		color: white;
+		border: none;
+		font-size: 30px;
+		cursor: pointer;
+		line-height: 1;
+	}
+
+	.geo-modal-body {
+		flex: 1;
+		padding: 10px;
+	}
+
+	.geo-modal-footer {
+		padding: 12px;
+		border-top: 1px solid #ddd;
+		text-align: right;
+		background: #f8f9fa;
+	}
+
+	.geo-help {
+		background: #e8f4ff;
+		border: 1px solid #b6dcff;
+		padding: 8px 12px;
+		margin-bottom: 10px;
+		border-radius: 5px;
+		font-size: 13px;
+	}
+
+	#mapaGeocerca {
+		width: 100%;
+		height: calc(100% - 45px);
+		border: 1px solid #ddd;
+		border-radius: 6px;
+	}
+
+	#mapaPreview {
+		height: 300px;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+	}
+
+	@media (max-width: 768px) {
+		.geo-modal-content {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			border-radius: 0;
+		}
+
+		.geo-modal-footer {
+			text-align: center;
+		}
+
+		.geo-modal-footer .btn {
+			margin-bottom: 6px;
+		}
+	}
+</style>
 
 <div class="container-fluid">
 	<div class="row">
@@ -76,28 +169,28 @@ if (isset($_GET["repetido"])) {
 								<label>Longitud 1</label>
 								<input type="text" class="form-control" id="longitud1" name="longitud1"
 									value="<?php echo $vte->longitud1; ?>"
-									placeholder="Longitud 1">
+									placeholder="-70.3975000">
 							</div>
 
 							<div class="form-group">
 								<label>Longitud 2</label>
 								<input type="text" class="form-control" id="longitud2" name="longitud2"
 									value="<?php echo $vte->longitud2; ?>"
-									placeholder="Longitud 2">
+									placeholder="-70.3979000">
 							</div>
 
 							<div class="form-group">
 								<label>Latitud 1</label>
 								<input type="text" class="form-control" id="latitud1" name="latitud1"
 									value="<?php echo $vte->latitud1; ?>"
-									placeholder="Latitud 1">
+									placeholder="-23.6509000">
 							</div>
 
 							<div class="form-group">
 								<label>Latitud 2</label>
 								<input type="text" class="form-control" id="latitud2" name="latitud2"
 									value="<?php echo $vte->latitud2; ?>"
-									placeholder="Latitud 2">
+									placeholder="-23.6512000">
 							</div>
 
 							<div class="form-group">
@@ -163,13 +256,13 @@ if (isset($_GET["repetido"])) {
 
 							<div class="form-group">
 								<label>Mapa de referencia</label>
-								<div id="mapaPreview" style="height: 300px; border:1px solid #ddd; border-radius:8px;"></div>
+								<div id="mapaPreview"></div>
 							</div>
 
 							<div class="form-group">
-			<button type="button" class="btn btn-info" onclick="abrirMapaGeocerca(); return false;">
-	Configurar Geocerca
-</button>
+								<button type="button" class="btn btn-info" onclick="abrirMapaGeocercaManual(); return false;">
+									Configurar Geocerca
+								</button>
 							</div>
 
 							<div class="form-group">
@@ -190,43 +283,37 @@ if (isset($_GET["repetido"])) {
 	</div>
 </div>
 
-<div class="modal fade" id="modalGeocerca" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-xl" role="document" style="max-width:95%;">
-		<div class="modal-content">
+<div id="modalGeocercaManual" class="geo-modal">
+	<div class="geo-modal-content">
+		<div class="geo-modal-header">
+			<h3>
+				Configurar Geocerca:
+				<strong><?php echo $vte->nombreControl; ?></strong>
+			</h3>
 
-			<div class="modal-header bg-primary text-white">
-				<h5 class="modal-title">
-					Configurar Geocerca del Control:
-					<strong><?php echo $vte->nombreControl; ?></strong>
-				</h5>
+			<button type="button" onclick="cerrarMapaGeocercaManual()">×</button>
+		</div>
 
-				<button type="button" class="close text-white" data-dismiss="modal">
-					<span>&times;</span>
-				</button>
+		<div class="geo-modal-body">
+			<div class="geo-help">
+				Dibuja el polígono del punto de control. Debe tener mínimo 3 puntos.
 			</div>
 
-			<div class="modal-body">
-				<div class="alert alert-info">
-					Dibuja el polígono del punto de control. Debe tener mínimo 3 puntos.
-				</div>
+			<div id="mapaGeocerca"></div>
+		</div>
 
-				<div id="mapaGeocerca" style="width:100%; height:70vh; border:1px solid #ddd;"></div>
+		<div class="geo-modal-footer">
+			<button type="button" class="btn btn-success" onclick="guardarGeocerca()">
+				Guardar Geocerca
+			</button>
 
-				<div style="margin-top:15px;">
-					<button type="button" class="btn btn-success" onclick="guardarGeocerca()">
-						Guardar Geocerca
-					</button>
+			<button type="button" class="btn btn-warning" onclick="limpiarGeocerca()">
+				Limpiar
+			</button>
 
-					<button type="button" class="btn btn-warning" onclick="limpiarGeocerca()">
-						Limpiar
-					</button>
-
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">
-						Cerrar
-					</button>
-				</div>
-			</div>
-
+			<button type="button" class="btn btn-danger" onclick="cerrarMapaGeocercaManual()">
+				Cerrar
+			</button>
 		</div>
 	</div>
 </div>
@@ -237,10 +324,52 @@ let mapaGeocerca = null;
 let drawnItems = null;
 let drawControl = null;
 let poligonoActual = null;
+let previewPolygon = null;
 
 document.addEventListener('DOMContentLoaded', function () {
 	iniciarMapaPreview();
 });
+
+function abrirMapaGeocercaManual() {
+	const idControlActual = obtenerIdControl();
+
+	if (!idControlActual || idControlActual <= 0) {
+		alert('No se encontró idControl. Este control debe estar guardado.');
+		return;
+	}
+
+	const modal = document.getElementById('modalGeocercaManual');
+
+	if (!modal) {
+		alert('No existe el modal modalGeocercaManual en la vista.');
+		return;
+	}
+
+	modal.style.display = 'block';
+
+	setTimeout(function () {
+		if (!mapaGeocerca) {
+			iniciarMapaGeocerca();
+		}
+
+		if (mapaGeocerca) {
+			mapaGeocerca.invalidateSize();
+			cargarGeocercaExistente();
+		}
+	}, 400);
+}
+
+function cerrarMapaGeocercaManual() {
+	const modal = document.getElementById('modalGeocercaManual');
+
+	if (modal) {
+		modal.style.display = 'none';
+	}
+
+	if (mapaPreview) {
+		mapaPreview.invalidateSize();
+	}
+}
 
 function iniciarMapaPreview() {
 	if (typeof L === 'undefined') {
@@ -248,27 +377,22 @@ function iniciarMapaPreview() {
 		return;
 	}
 
-	const lat1 = parseFloat(document.getElementById('latitud1').value);
-	const lat2 = parseFloat(document.getElementById('latitud2').value);
-	const lng1 = parseFloat(document.getElementById('longitud1').value);
-	const lng2 = parseFloat(document.getElementById('longitud2').value);
-
-	let centerLat = -23.6467;
-	let centerLng = -70.3976;
-	let initialZoom = 13;
-
-	if (!isNaN(lat1) && !isNaN(lat2) && !isNaN(lng1) && !isNaN(lng2)) {
-		centerLat = (lat1 + lat2) / 2;
-		centerLng = (lng1 + lng2) / 2;
-		initialZoom = 16;
+	if (mapaPreview) {
+		return;
 	}
 
-	mapaPreview = L.map('mapaPreview').setView([centerLat, centerLng], initialZoom);
+	const centro = obtenerCentroMapaDesdeCampos();
+
+	mapaPreview = L.map('mapaPreview').setView([centro.lat, centro.lng], centro.zoom);
 
 	L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 20,
 		attribution: '&copy; OpenStreetMap contributors'
 	}).addTo(mapaPreview);
+
+	setTimeout(function () {
+		mapaPreview.invalidateSize();
+	}, 300);
 
 	cargarGeocercaPreview();
 }
@@ -284,6 +408,11 @@ async function cargarGeocercaPreview() {
 		const response = await fetch('?c=controles&a=ObtenerGeocerca&idControl=' + encodeURIComponent(idControlActual));
 		const json = await response.json();
 
+		if (previewPolygon) {
+			mapaPreview.removeLayer(previewPolygon);
+			previewPolygon = null;
+		}
+
 		if (!json.success || !json.data || json.data.length === 0) {
 			return;
 		}
@@ -295,60 +424,19 @@ async function cargarGeocercaPreview() {
 			];
 		});
 
-		const polygon = L.polygon(puntos, {
+		previewPolygon = L.polygon(puntos, {
 			color: '#2563eb',
 			weight: 4,
 			fillOpacity: 0.25
 		}).addTo(mapaPreview);
 
-		mapaPreview.fitBounds(polygon.getBounds(), {
+		mapaPreview.fitBounds(previewPolygon.getBounds(), {
 			padding: [20, 20]
 		});
 
 	} catch (error) {
 		console.error('Error cargando preview de geocerca:', error);
 	}
-}
-
-function abrirMapaGeocerca() {
-	const idControlActual = obtenerIdControl();
-
-	if (!idControlActual || idControlActual <= 0) {
-		alert('No se encontró idControl. Este control debe estar guardado antes de crear la geocerca.');
-		return;
-	}
-
-	const modal = document.getElementById('modalGeocerca');
-
-	if (!modal) {
-		alert('No existe el modal modalGeocerca en la vista.');
-		return;
-	}
-
-	// Bootstrap 5
-	if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-		const modalInstance = new bootstrap.Modal(modal);
-		modalInstance.show();
-	} 
-	// Bootstrap 3 / 4 con jQuery
-	else if (typeof $ !== 'undefined' && typeof $('#modalGeocerca').modal === 'function') {
-		$('#modalGeocerca').modal('show');
-	} 
-	else {
-		alert('Bootstrap Modal no está cargado correctamente.');
-		return;
-	}
-
-	setTimeout(function () {
-		if (!mapaGeocerca) {
-			iniciarMapaGeocerca();
-		}
-
-		if (mapaGeocerca) {
-			mapaGeocerca.invalidateSize();
-			cargarGeocercaExistente();
-		}
-	}, 600);
 }
 
 function iniciarMapaGeocerca() {
@@ -362,22 +450,9 @@ function iniciarMapaGeocerca() {
 		return;
 	}
 
-	const lat1 = parseFloat(document.getElementById('latitud1').value);
-	const lat2 = parseFloat(document.getElementById('latitud2').value);
-	const lng1 = parseFloat(document.getElementById('longitud1').value);
-	const lng2 = parseFloat(document.getElementById('longitud2').value);
+	const centro = obtenerCentroMapaDesdeCampos();
 
-	let centerLat = -23.6467;
-	let centerLng = -70.3976;
-	let initialZoom = 14;
-
-	if (!isNaN(lat1) && !isNaN(lat2) && !isNaN(lng1) && !isNaN(lng2)) {
-		centerLat = (lat1 + lat2) / 2;
-		centerLng = (lng1 + lng2) / 2;
-		initialZoom = 16;
-	}
-
-	mapaGeocerca = L.map('mapaGeocerca').setView([centerLat, centerLng], initialZoom);
+	mapaGeocerca = L.map('mapaGeocerca').setView([centro.lat, centro.lng], centro.zoom >= 16 ? centro.zoom : 16);
 
 	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 20,
@@ -451,13 +526,12 @@ async function cargarGeocercaExistente() {
 		const response = await fetch('?c=controles&a=ObtenerGeocerca&idControl=' + encodeURIComponent(idControlActual));
 		const json = await response.json();
 
+		drawnItems.clearLayers();
+		poligonoActual = null;
+
 		if (!json.success || !json.data || json.data.length === 0) {
-			drawnItems.clearLayers();
-			poligonoActual = null;
 			return;
 		}
-
-		drawnItems.clearLayers();
 
 		const puntos = json.data.map(function (p) {
 			return [
@@ -495,8 +569,8 @@ function obtenerPuntosPoligono() {
 
 	return latLngs.map(function (p) {
 		return {
-			lat: p.lat,
-			lng: p.lng
+			lat: parseFloat(p.lat),
+			lng: parseFloat(p.lng)
 		};
 	});
 }
@@ -532,18 +606,12 @@ async function guardarGeocerca() {
 
 		if (json.success) {
 			alert(json.message || 'Geocerca guardada correctamente');
-			$('#modalGeocerca').modal('hide');
+
+			cerrarMapaGeocercaManual();
 
 			if (mapaPreview) {
-				mapaPreview.eachLayer(function (layer) {
-					if (layer instanceof L.Polygon) {
-						mapaPreview.removeLayer(layer);
-					}
-				});
-
 				cargarGeocercaPreview();
 			}
-
 		} else {
 			alert(json.message || 'No se pudo guardar la geocerca');
 		}
@@ -588,6 +656,47 @@ function actualizarCamposCoordenadasDesdePoligono() {
 
 	document.getElementById('longitud1').value = Math.min.apply(null, longitudes).toFixed(7);
 	document.getElementById('longitud2').value = Math.max.apply(null, longitudes).toFixed(7);
+}
+
+function obtenerCentroMapaDesdeCampos() {
+	let lat1 = parseFloat(document.getElementById('latitud1').value);
+	let lat2 = parseFloat(document.getElementById('latitud2').value);
+	let lng1 = parseFloat(document.getElementById('longitud1').value);
+	let lng2 = parseFloat(document.getElementById('longitud2').value);
+
+	if (valoresCoordenadasValidos(lat1, lat2, lng1, lng2)) {
+		return {
+			lat: (lat1 + lat2) / 2,
+			lng: (lng1 + lng2) / 2,
+			zoom: 16
+		};
+	}
+
+	return {
+		lat: -23.6467,
+		lng: -70.3976,
+		zoom: 13
+	};
+}
+
+function valoresCoordenadasValidos(lat1, lat2, lng1, lng2) {
+	if (isNaN(lat1) || isNaN(lat2) || isNaN(lng1) || isNaN(lng2)) {
+		return false;
+	}
+
+	if (lat1 < -90 || lat1 > 90 || lat2 < -90 || lat2 > 90) {
+		return false;
+	}
+
+	if (lng1 < -180 || lng1 > 180 || lng2 < -180 || lng2 > 180) {
+		return false;
+	}
+
+	if (Math.abs(lat1) < 1 || Math.abs(lat2) < 1 || Math.abs(lng1) < 1 || Math.abs(lng2) < 1) {
+		return false;
+	}
+
+	return true;
 }
 
 function obtenerIdControl() {
