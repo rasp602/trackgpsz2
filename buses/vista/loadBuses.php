@@ -1,163 +1,243 @@
 <?php
-/*
-* Script: Cargar datos de lado del servidor con PHP y MySQL
-* Autor: Marco Robles
-* Team: Códigos de Programación
-*/
-
-
 require '../../bd/config.php';
 
-/* Un arreglo de las columnas a mostrar en la tabla */
-$columns = ['buses.idBus','buses.numeroBus', 'buses.placaBus', 'buses.tipoBus', 'buses.idPersona', 'buses.estadoBus', 'buses.validez', 'buses.idGps','persona.idPersona','persona.nombre1Persona','persona.apellido1Persona','gps.idGps','gps.imeiGps','gps.modelo'];
+header('Content-Type: application/json; charset=utf-8');
 
-/* Nombre de la tabla */
-$table = "buses";
+$columns = [
+    'b.numeroBus',
+    'b.placaBus',
+    'b.tipoBus',
+    "CONCAT(COALESCE(p.nombre1Persona, ''), ' ', COALESCE(p.apellido1Persona, ''))",
+    'bd.imei',
+    'd.simCard',
+    'd.modelo',
+    'b.estadoBus'
+];
 
-$id = 'idBus';
+$campo = isset($_POST['campo']) ? trim($_POST['campo']) : '';
+$limit = isset($_POST['registros']) ? intval($_POST['registros']) : 10;
+$pagina = isset($_POST['pagina']) ? intval($_POST['pagina']) : 1;
+$orderCol = isset($_POST['orderCol']) ? intval($_POST['orderCol']) : 0;
+$orderType = isset($_POST['orderType']) && strtolower($_POST['orderType']) === 'desc'
+    ? 'DESC'
+    : 'ASC';
 
-$campo = isset($_POST['campo']) ? $conn->real_escape_string($_POST['campo']) : null;
-
-
-/* Filtrado */
-$where = '';
-
-if ($campo != null ) {
-    $where = "WHERE (";
-
-    $cont = count($columns);
-    for ($i = 0; $i < $cont; $i++) {
-        $where .= $columns[$i] . " LIKE '%" . $campo . "%' OR ";
-    }
-    $where = substr_replace($where, "", -3);
-    $where .= ")";
+if ($limit <= 0 || $limit > 500) {
+    $limit = 10;
 }
 
-
-
-/* Limit */
-$limit = isset($_POST['registros']) ? $conn->real_escape_string($_POST['registros']) : 10;
-$pagina = isset($_POST['pagina']) ? $conn->real_escape_string($_POST['pagina']) : 0;
-
-if (!$pagina) {
-    $inicio = 0;
+if ($pagina <= 0) {
     $pagina = 1;
-} else {
-    $inicio = ($pagina - 1) * $limit;
 }
 
-$sLimit = "LIMIT $inicio , $limit";
+if (!isset($columns[$orderCol])) {
+    $orderCol = 0;
+}
 
-/**
- * Ordenamiento
- */
+$inicio = ($pagina - 1) * $limit;
 
- $sOrder = "";
- if(isset($_POST['orderCol'])){
-    $orderCol = $_POST['orderCol'];
-    $oderType = isset($_POST['orderType']) ? $_POST['orderType'] : 'asc';
-    
-    $sOrder = "ORDER BY ". $columns[intval($orderCol)] . ' ' . $oderType;
- }
+$from = "
+    FROM buses b
+    LEFT JOIN persona p
+        ON p.idPersona = b.idPersona
+    LEFT JOIN bus_dispositivo bd
+        ON bd.idBus = b.idBus
+        AND bd.estado = 'ACTIVO'
+        AND bd.fechaFin IS NULL
+    LEFT JOIN dispositivos d
+        ON d.imei = bd.imei
+";
 
+$where = '';
+$params = [];
+$types = '';
 
-/* Consulta */
-$sql = "SELECT SQL_CALC_FOUND_ROWS " . implode(", ", $columns) . "
-FROM $table 
-INNER JOIN persona ON buses.idPersona = persona.idPersona
-INNER JOIN gps ON buses.idGps = gps.idGps
+if ($campo !== '') {
+    $like = '%' . $campo . '%';
 
-$where
-$sOrder
-$sLimit";
-$resultado = $conn->query($sql);
-$num_rows = $resultado->num_rows;
+    $where = "
+        WHERE (
+            CAST(b.numeroBus AS CHAR) LIKE ?
+            OR b.placaBus LIKE ?
+            OR b.tipoBus LIKE ?
+            OR p.nombre1Persona LIKE ?
+            OR p.apellido1Persona LIKE ?
+            OR bd.imei LIKE ?
+            OR d.simCard LIKE ?
+            OR d.marca LIKE ?
+            OR d.modelo LIKE ?
+            OR d.descripcion LIKE ?
+        )
+    ";
 
-/* Consulta para total de registro filtrados */
-$sqlFiltro = "SELECT FOUND_ROWS()";
-$resFiltro = $conn->query($sqlFiltro);
-$row_filtro = $resFiltro->fetch_array();
-$totalFiltro = $row_filtro[0];
+    for ($i = 0; $i < 10; $i++) {
+        $params[] = $like;
+        $types .= 's';
+    }
+}
 
-/* Consulta para total de registro filtrados */
-$sqlTotal = "SELECT count($id) FROM $table ";
+$sqlTotal = "SELECT COUNT(*) AS total FROM buses";
 $resTotal = $conn->query($sqlTotal);
-$row_total = $resTotal->fetch_array();
-$totalRegistros = $row_total[0];
+$totalRegistros = $resTotal ? intval($resTotal->fetch_assoc()['total']) : 0;
 
-/* Mostrado resultados */
-$output = [];
-$output['totalRegistros'] = $totalRegistros;
-$output['totalFiltro'] = $totalFiltro;
-$output['data'] = '';
-$output['paginacion'] = '';
+$sqlFiltro = "SELECT COUNT(DISTINCT b.idBus) AS total " . $from . $where;
+$stmtFiltro = $conn->prepare($sqlFiltro);
 
+if (!$stmtFiltro) {
+    echo json_encode([
+        'totalRegistros' => 0,
+        'totalFiltro' => 0,
+        'data' => '<tr><td colspan="9">Error preparando conteo: ' .
+            htmlspecialchars($conn->error, ENT_QUOTES, 'UTF-8') .
+            '</td></tr>',
+        'paginacion' => ''
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
+if ($types !== '') {
+    $stmtFiltro->bind_param($types, ...$params);
+}
 
-if ($num_rows > 0) {
+$stmtFiltro->execute();
+$resultFiltro = $stmtFiltro->get_result();
+$totalFiltro = intval($resultFiltro->fetch_assoc()['total']);
+$stmtFiltro->close();
+
+$sql = "
+    SELECT
+        b.idBus,
+        b.numeroBus,
+        b.placaBus,
+        b.tipoBus,
+        b.estadoBus,
+        CONCAT(
+            COALESCE(p.nombre1Persona, 'Empresa'),
+            ' ',
+            COALESCE(p.apellido1Persona, '')
+        ) AS propietario,
+        bd.imei,
+        d.simCard,
+        d.marca,
+        d.modelo,
+        d.descripcion
+    " . $from . $where . "
+    ORDER BY " . $columns[$orderCol] . " " . $orderType . "
+    LIMIT ?, ?
+";
+
+$stmt = $conn->prepare($sql);
+
+if (!$stmt) {
+    echo json_encode([
+        'totalRegistros' => $totalRegistros,
+        'totalFiltro' => $totalFiltro,
+        'data' => '<tr><td colspan="9">Error preparando consulta: ' .
+            htmlspecialchars($conn->error, ENT_QUOTES, 'UTF-8') .
+            '</td></tr>',
+        'paginacion' => ''
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$queryParams = $params;
+$queryParams[] = $inicio;
+$queryParams[] = $limit;
+$queryTypes = $types . 'ii';
+
+$stmt->bind_param($queryTypes, ...$queryParams);
+$stmt->execute();
+$resultado = $stmt->get_result();
+
+$output = [
+    'totalRegistros' => $totalRegistros,
+    'totalFiltro' => $totalFiltro,
+    'data' => '',
+    'paginacion' => ''
+];
+
+if ($resultado->num_rows > 0) {
     while ($row = $resultado->fetch_assoc()) {
-if ($row['estadoBus']==1) {
-  $estado="Activo";
-}
-elseif($row['estadoBus']==0){
-    $estado="Inactivo";
-}
+        $estado = intval($row['estadoBus']) === 1 ? 'Activo' : 'Inactivo';
+        $estadoClase = intval($row['estadoBus']) === 1 ? 'text-success' : 'text-muted';
+
+        $imei = $row['imei'] ?: 'Sin GPS';
+        $simCard = $row['simCard'] ?: '-';
+        $modelo = trim(($row['marca'] ?: '') . ' ' . ($row['modelo'] ?: ''));
+        if ($modelo === '') {
+            $modelo = '-';
+        }
+
+        $idBus = intval($row['idBus']);
 
         $output['data'] .= '<tr>';
-     
-        $output['data'] .= '<td>' . $row['numeroBus'] . '</td>';
-        $output['data'] .= '<td>' . $row['placaBus'] . '</td>';
-        $output['data'] .= '<td>' . $row['tipoBus'] . '</td>';
-        $output['data'] .= '<td>' . $row['nombre1Persona'] ." ". $row['apellido1Persona'] . '</td>';
-        $output['data'] .= '<td>' . $row['imeiGps'] . '</td>';
-        $output['data'] .= '<td>' . $row['modelo'] . '</td>';
-        $output['data'] .= '<td>' . $estado . '</td>';
-        
-
-$output['data'] .= '<td>
-    <a class="glyphicon glyphicon-edit" href="?c=buses&a=Crud1&idBus=' . $row['idBus'] . '"></a>
-    <a class="glyphicon glyphicon-trash" 
-       href="?c=buses&a=Eliminar&idBus='. $row['idBus'] . '" 
-       onclick="return confirm(\'¿Seguro de eliminar este registro?\');">
-    </a>
-</td>';
-
+        $output['data'] .= '<td>' . htmlspecialchars($row['numeroBus'], ENT_QUOTES, 'UTF-8') . '</td>';
+        $output['data'] .= '<td>' . htmlspecialchars($row['placaBus'], ENT_QUOTES, 'UTF-8') . '</td>';
+        $output['data'] .= '<td>' . htmlspecialchars($row['tipoBus'], ENT_QUOTES, 'UTF-8') . '</td>';
+        $output['data'] .= '<td>' . htmlspecialchars(trim($row['propietario']), ENT_QUOTES, 'UTF-8') . '</td>';
+        $output['data'] .= '<td>' . htmlspecialchars($imei, ENT_QUOTES, 'UTF-8') . '</td>';
+        $output['data'] .= '<td>' . htmlspecialchars($simCard, ENT_QUOTES, 'UTF-8') . '</td>';
+        $output['data'] .= '<td>' . htmlspecialchars($modelo, ENT_QUOTES, 'UTF-8') . '</td>';
+        $output['data'] .= '<td class="' . $estadoClase . '"><strong>' . $estado . '</strong></td>';
+        $output['data'] .= '
+            <td>
+                <a
+                    class="glyphicon glyphicon-edit"
+                    title="Editar bus y gestionar GPS"
+                    href="?c=buses&a=Crud1&idBus=' . $idBus . '"
+                ></a>
+                &nbsp;&nbsp;
+                <a
+                    class="glyphicon glyphicon-trash"
+                    title="Eliminar"
+                    href="?c=buses&a=Eliminar&idBus=' . $idBus . '"
+                    onclick="return confirm(\'¿Seguro de eliminar este bus? Los buses con historial GPS no pueden eliminarse.\');"
+                ></a>
+            </td>
+        ';
         $output['data'] .= '</tr>';
     }
 } else {
-    $output['data'] .= '<tr>';
-    $output['data'] .= '<td colspan="7">Sin resultados</td>';
-    $output['data'] .= '</tr>';
+    $output['data'] = '<tr><td colspan="9">Sin resultados</td></tr>';
 }
 
-if ($output['totalRegistros'] > 0) {
-    $totalPaginas = ceil($output['totalRegistros'] / $limit);
+$stmt->close();
 
-    $output['paginacion'] .= '<nav>';
-    $output['paginacion'] .= '<ul class="pagination">';
+if ($totalFiltro > 0) {
+    $totalPaginas = intval(ceil($totalFiltro / $limit));
+    $numeroInicio = max(1, $pagina - 4);
+    $numeroFin = min($totalPaginas, $numeroInicio + 9);
 
-    $numeroInicio = 1;
+    $output['paginacion'] .= '<nav><ul class="pagination">';
 
-    if(($pagina - 4) > 1){
-        $numeroInicio = $pagina - 4;
-    }
-
-    $numeroFin = $numeroInicio + 9;
-
-    if($numeroFin > $totalPaginas){
-        $numeroFin = $totalPaginas;
+    if ($pagina > 1) {
+        $output['paginacion'] .=
+            '<li class="page-item"><a class="page-link" href="#" onclick="nextPage(' .
+            ($pagina - 1) .
+            '); return false;">Anterior</a></li>';
     }
 
     for ($i = $numeroInicio; $i <= $numeroFin; $i++) {
-        if ($pagina == $i) {
-            $output['paginacion'] .= '<li class="page-item active"><a class="page-link" href="#">' . $i . '</a></li>';
+        if ($pagina === $i) {
+            $output['paginacion'] .=
+                '<li class="page-item active"><span class="page-link">' . $i . '</span></li>';
         } else {
-            $output['paginacion'] .= '<li class="page-item"><a class="page-link" href="#" onclick="nextPage(' . $i . ')">' . $i . '</a></li>';
+            $output['paginacion'] .=
+                '<li class="page-item"><a class="page-link" href="#" onclick="nextPage(' .
+                $i .
+                '); return false;">' . $i . '</a></li>';
         }
     }
 
-    $output['paginacion'] .= '</ul>';
-    $output['paginacion'] .= '</nav>';
+    if ($pagina < $totalPaginas) {
+        $output['paginacion'] .=
+            '<li class="page-item"><a class="page-link" href="#" onclick="nextPage(' .
+            ($pagina + 1) .
+            '); return false;">Siguiente</a></li>';
+    }
+
+    $output['paginacion'] .= '</ul></nav>';
 }
 
 echo json_encode($output, JSON_UNESCAPED_UNICODE);
+?>

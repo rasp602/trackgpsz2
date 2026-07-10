@@ -1,215 +1,168 @@
 <?php
-	error_reporting(E_ERROR | E_PARSE); // Desactiva la notificación y warnings de error en php.
-/*  date_default_timezone_set("America/caracas");
-  $hora=date("H:i:s");
-  echo $hora;*/
+error_reporting(E_ERROR | E_PARSE);
+
+$numeroBus = isset($vte->numeroBus) ? $vte->numeroBus : '';
+$placaBus = isset($vte->placaBus) ? $vte->placaBus : '';
+$tipoBus = isset($vte->tipoBus) && $vte->tipoBus !== '' ? $vte->tipoBus : 'MICRO';
+$idPersona = isset($vte->idPersona) ? intval($vte->idPersona) : 0;
 ?>
 
-<!-- Include Date Range Picker -->
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+<?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>
+
+<div class="container-fluid">
+    <?php if (isset($_GET['repetido'])): ?>
+        <div class="alert alert-warning">El número de bus ya se encuentra registrado.</div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['error']) && $_GET['error'] === 'numero'): ?>
+        <div class="alert alert-danger">Debe ingresar el número del bus.</div>
+    <?php endif; ?>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="titulos" style="text-align:center;">Nuevo Bus</h2>
+
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Datos del Bus</h3>
+                </div>
+
+                <form id="form1" action="?c=buses&a=Guardar" method="post">
+                    <input type="hidden" id="idBus" name="idBus" value="">
+                    <input type="hidden" id="validez" name="validez" value="1">
+                    <input type="hidden" id="estadoBus" name="estadoBus" value="1">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="numeroBus">Número de Bus</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="numeroBus"
+                                        name="numeroBus"
+                                        value="<?php echo htmlspecialchars($numeroBus, ENT_QUOTES, 'UTF-8'); ?>"
+                                        maxlength="10"
+                                        onkeypress="return numeros(event)"
+                                        placeholder="Ingresa el número de bus"
+                                        required
+                                    >
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="placaBus">Placa Bus</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="placaBus"
+                                        name="placaBus"
+                                        value="<?php echo htmlspecialchars($placaBus, ENT_QUOTES, 'UTF-8'); ?>"
+                                        maxlength="20"
+                                        placeholder="Ingresa la placa del bus"
+                                    >
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tipoBus">Tipo de Bus</label>
+                                    <select name="tipoBus" id="tipoBus" class="form-control" required>
+                                        <option value="MICRO" <?php echo $tipoBus === 'MICRO' ? 'selected' : ''; ?>>Micro</option>
+                                        <option value="VANS" <?php echo $tipoBus === 'VANS' ? 'selected' : ''; ?>>Vans</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="idPersona">Propietario</label>
+                                    <select name="idPersona" id="idPersona" class="form-control">
+                                        <option value="0">Empresa</option>
+                                        <?php foreach ($this->model->ListarPropietarios() as $propietario): ?>
+                                            <option
+                                                value="<?php echo intval($propietario->idPersona); ?>"
+                                                <?php echo intval($propietario->idPersona) === $idPersona ? 'selected' : ''; ?>
+                                            >
+                                                <?php
+                                                echo htmlspecialchars(
+                                                    trim($propietario->nombre1Persona . ' ' . $propietario->apellido1Persona),
+                                                    ENT_QUOTES,
+                                                    'UTF-8'
+                                                );
+                                                ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    Puedes asignar el GPS inicial ahora o dejarlo sin equipo y asignarlo después desde la edición del bus.
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="imeiInicial">GPS inicial opcional</label>
+                                    <select name="imeiInicial" id="imeiInicial" class="form-control">
+                                        <option value="">Sin GPS inicial</option>
+                                        <?php foreach ($this->model->ListarGpsDisponibles() as $gps): ?>
+                                            <option value="<?php echo htmlspecialchars($gps->imei, ENT_QUOTES, 'UTF-8'); ?>">
+                                                <?php
+                                                $texto = $gps->imei;
+                                                if (!empty($gps->descripcion)) {
+                                                    $texto .= ' - ' . $gps->descripcion;
+                                                }
+                                                if (!empty($gps->modelo)) {
+                                                    $texto .= ' (' . $gps->modelo . ')';
+                                                }
+                                                echo htmlspecialchars($texto, ENT_QUOTES, 'UTF-8');
+                                                ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="observacionGps">Observación de instalación</label>
+                                    <textarea
+                                        class="form-control"
+                                        id="observacionGps"
+                                        name="observacionGps"
+                                        rows="3"
+                                        maxlength="255"
+                                        placeholder="Ejemplo: Equipo instalado al incorporar el bus"
+                                    ></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Registrar Bus</button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger"
+                                        onclick="location.href='?c=buses&a=menuBuses'"
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-function subirimagen()
-{
-  self.name = 'opener';
-  remote = open('persona/vista/gestionimagen.php', 'remote', 'width=600,height=200,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,fullscreen=yes, status=yes');
-  remote.focus();
-  }
+function numeros(e) {
+    const key = e.keyCode || e.which;
+    const tecla = String.fromCharCode(key);
+    const permitidos = "0123456789";
+    const especiales = [8, 9, 13, 37, 39, 46];
 
+    if (especiales.indexOf(key) !== -1) {
+        return true;
+    }
+
+    return permitidos.indexOf(tecla) !== -1;
+}
 </script>
-
-
-  <?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>   
-  <?php $cliente=$usuario->id_user;?>       
-
-  <?php if (isset($_GET["repetido"])) echo '<div class="alert alert-warning" role="alert">El Bus que intenta ingresar ya se encuentra registrado...</div>';?> 
-
-  <div class="container-fluid">
-
-
-    <div class="row">         
-      <div class="col-md-12">
-            <h2 align="center" class="titulos">Nuevo Bus</h2>
-            <div class="card card-primary">
-              <div class="card-header">
-                <h3 class="card-title">Datos del Bus</h3>
-              </div>
-              <!-- /.card-header -->
-              <!-- form start -->
-              <form id="form1" action="?c=buses&a=Guardar" name="form1" method="post" enctype="multipart/form-data">
-              <div class="col-md-6">
-                <div class="card-body">
-                  <div class="form-group">
-                    <input type="hidden" class="form-control" id="idBus" name="idBus" value="<?php echo $vte->idBus;?>">
-                    <label for="exampleInputEmail1">Numero de Bus</label>
-                   <input type="text" class="form-control" id="numeroBus" name="numeroBus" value="<?php echo $vte->numeroBus;?>" maxlength="10"onkeypress="return numeros(event)" placeholder="Ingresa el numero de bus">
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputPassword1">Placa Bus</label>
-                    <input type="text" class="form-control" id="placaBus" name="placaBus" value="<?php echo $vte->placaBus;?>" onkeypress="" placeholder="Ingresa la placa del bus">
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">Tipo de Bus</label>
-                 
-                      <select name="tipoBus" id="tipoBus" class="form-control  input-md" required>
-                            <option value="MICRO">Micro</option>
-                            <option value="VANS">VANS</option>          
-                      </select>
-                 
-                  </div>                  
-                  <input type="hidden" class="form-control" id="validez" name="validez" value="1"> 
-                  <input type="hidden" class="form-control" id="estadoBus" name="estadoBus" value="1"> 
-                  
-              
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="card-body">
-                 <div class="form-group">
-                    <label for="exampleInputPropietario">Seleccione un Propietario:</label>
-                      <select name="idPersona" id="idPersona" class="form-control  input-md">
-                            <option value="0">Empresa</option>
-                        <?php  foreach ($this->model->ListarPropietarios()as $a): ?>
-                      
-                        <option  <?php echo $a->idPersona == "" ? 'selected' : ''; ?> value="<?php echo "$a->idPersona" ;?>"><?php echo $a->nombre1Persona.' '.$a->apellido1Persona;?></option>
-                                      <?php endforeach; ?>  
-                      </select>
-                  </div>  
-
-
-
-                  <div class="form-group">
-                    <label for="exampleInputPassword1">Gps</label>
-                   
-                      <select name="idGps" id="idGps" class="form-control  input-md">
-                     
-                        <?php  foreach ($this->model->ListarGps()as $a): ?>
-                      
-                        <option  <?php echo $a->idGps == "" ? 'selected' : ''; ?> value="<?php echo "$a->idGps" ;?>"><?php echo $a->imeiGps;?></option>
-                                      <?php endforeach; ?>  
-                      </select>
-                 
-                  </div>  
-
-                  <div class="form-group">             
-                    <button type="submit" class="btn btn-primary">Registrar</button>
-                    <input type="button" id="cancelar" class="btn btn-danger" name="Cancelar" value="Cancelar" onClick="location.href='?c=menu_principal&a=menu_usuarios'">
-                  </div>                 
-                </div>
-              </div>              
-                <!-- /.card-body -->
-
-
-              </form>
-            </div>
-
-
-            </div>
-            
-        </div>
-   </div>    
-<br>
-   </div> 
- <script>
-    function numeros(e){
-    key = e.keyCode || e.which;
-    tecla = String.fromCharCode(key).toLowerCase();
-    letras = " 0123456789";
-    especiales = [9,13,8,37,39,46,38,46,164];
- 
-    tecla_especial = false
-    for(var i in especiales){
- if(key == especiales[i]){
-     tecla_especial = true;
-     break;
-        } 
-    }
- 
-    if(letras.indexOf(tecla)==-1 && !tecla_especial)
-        return false;
-}
-    </script>
-
-
-
-      <script>
-       
-       function sololetras(e){
-           key= e.keyCode || e.which;
-           teclado= String .fromCharCode(key).toLowerCase();
-           letras="abcdefghijklmnñopqrstuvwxyz"
-           especiales="13-9-8-37-38-46-164";
-           
-           teclado_especial=false;
-           
-           for(var i in especiales){
-               
-               if(key==especiales[i]){
-                   teclado_especial=true;break;
-                   
-                   }
-               }
-           if(letras.indexOf(teclado)==-1 && !teclado_especial){
-               
-               return false;
-               
-               }
-           
-           }
-       
-       
-       </script> 
-
- <script>
-       
-function checkRut(rut) {
-    // Despejar Puntos
-    var valor = rut.value.replace('.','');
-    // Despejar Guión
-    valor = valor.replace('-','');
-    
-    // Aislar Cuerpo y Dígito Verificador
-    cuerpo = valor.slice(0,-1);
-    dv = valor.slice(-1).toUpperCase();
-    
-    // Formatear RUN
-    rut.value = cuerpo + '-'+ dv
-    
-    // Si no cumple con el mínimo ej. (n.nnn.nnn)
-    if(cuerpo.length < 7) { rut.setCustomValidity("RUT Incompleto"); return false;}
-    
-    // Calcular Dígito Verificador
-    suma = 0;
-    multiplo = 2;
-    
-    // Para cada dígito del Cuerpo
-    for(i=1;i<=cuerpo.length;i++) {
-    
-        // Obtener su Producto con el Múltiplo Correspondiente
-        index = multiplo * valor.charAt(cuerpo.length - i);
-        
-        // Sumar al Contador General
-        suma = suma + index;
-        
-        // Consolidar Múltiplo dentro del rango [2,7]
-        if(multiplo < 7) { multiplo = multiplo + 1; } else { multiplo = 2; }
-  
-    }
-    
-    // Calcular Dígito Verificador en base al Módulo 11
-    dvEsperado = 11 - (suma % 11);
-    
-    // Casos Especiales (0 y K)
-    dv = (dv == 'K')?10:dv;
-    dv = (dv == 0)?11:dv;
-    
-    // Validar que el Cuerpo coincide con su Dígito Verificador
-    if(dvEsperado != dv) { rut.setCustomValidity("RUT Inválido"); return false; }
-    
-    // Si todo sale bien, eliminar errores (decretar que es válido)
-    rut.setCustomValidity('');
-}
-       
-       </script> 

@@ -1,225 +1,399 @@
 <?php
-    error_reporting(E_ERROR | E_PARSE); // Desactiva la notificación y warnings de error en php.
-/*  date_default_timezone_set("America/caracas");
-  $hora=date("H:i:s");
-  echo $hora;*/
+error_reporting(E_ERROR | E_PARSE);
+
+$idBus = intval($vte->idBus);
+$gpsActivo = $this->model->ObtenerGpsActivo($idBus);
+$historialGps = $this->model->HistorialGpsBus($idBus);
+$gpsDisponibles = $this->model->ListarGpsDisponibles($idBus);
 ?>
 
-<?php
-include 'bd/config.php';
+<?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>
 
-$sql_propietarios = "SELECT idPersona, nombre1Persona FROM persona";
-$result_propietarios = $conn->query($sql_propietarios);
+<style>
+.gps-box {
+    border: 1px solid #dbe3ec;
+    border-radius: 8px;
+    margin-top: 18px;
+    overflow: hidden;
+}
+.gps-box-header {
+    background: #f4f7fb;
+    border-bottom: 1px solid #dbe3ec;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.gps-active-card {
+    background: #ecfdf3;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 15px;
+}
+.gps-none {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 15px;
+}
+.gps-history-table td,
+.gps-history-table th {
+    vertical-align: middle !important;
+}
+.status-active {
+    color: #15803d;
+    font-weight: bold;
+}
+.status-inactive {
+    color: #64748b;
+    font-weight: bold;
+}
+</style>
 
-$sql_gps = "SELECT idGps, imeiGps FROM gps";
-$result_gps = $conn->query($sql_gps);
-?>
+<div class="container-fluid">
+    <?php if (isset($_GET['update'])): ?>
+        <div class="alert alert-success">Bus actualizado correctamente.</div>
+    <?php endif; ?>
 
-<!-- Include Date Range Picker -->
-<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+    <?php if (isset($_GET['success'])): ?>
+        <div class="alert alert-success">Bus registrado correctamente. Ahora puedes gestionar sus GPS.</div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['gps_success'])): ?>
+        <div class="alert alert-success">GPS asignado correctamente. La asignación anterior fue cerrada si existía.</div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['gps_retirado'])): ?>
+        <div class="alert alert-info">GPS retirado correctamente.</div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['gps_error'])): ?>
+        <div class="alert alert-danger">
+            No se pudo completar la operación GPS:
+            <?php echo htmlspecialchars($_GET['gps_error'], ENT_QUOTES, 'UTF-8'); ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['repetido'])): ?>
+        <div class="alert alert-warning">El número de bus ya se encuentra registrado.</div>
+    <?php endif; ?>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="titulos" style="text-align:center;">
+                Actualizar Bus N.º <?php echo htmlspecialchars($vte->numeroBus, ENT_QUOTES, 'UTF-8'); ?>
+            </h2>
+
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Datos del Bus</h3>
+                </div>
+
+                <form action="?c=buses&a=Guardar" method="post">
+                    <input type="hidden" name="idBus" value="<?php echo $idBus; ?>">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="numeroBus">Número de Bus</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="numeroBus"
+                                        name="numeroBus"
+                                        value="<?php echo htmlspecialchars($vte->numeroBus, ENT_QUOTES, 'UTF-8'); ?>"
+                                        maxlength="10"
+                                        required
+                                    >
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="placaBus">Placa Bus</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="placaBus"
+                                        name="placaBus"
+                                        value="<?php echo htmlspecialchars($vte->placaBus, ENT_QUOTES, 'UTF-8'); ?>"
+                                        maxlength="20"
+                                    >
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tipoBus">Tipo de Bus</label>
+                                    <select name="tipoBus" id="tipoBus" class="form-control" required>
+                                        <option value="MICRO" <?php echo $vte->tipoBus === 'MICRO' ? 'selected' : ''; ?>>Micro</option>
+                                        <option value="VANS" <?php echo $vte->tipoBus === 'VANS' ? 'selected' : ''; ?>>Vans</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="idPersona">Propietario</label>
+                                    <select name="idPersona" id="idPersona" class="form-control">
+                                        <option value="0" <?php echo intval($vte->idPersona) === 0 ? 'selected' : ''; ?>>Empresa</option>
+
+                                        <?php foreach ($this->model->ListarPropietarios() as $propietario): ?>
+                                            <option
+                                                value="<?php echo intval($propietario->idPersona); ?>"
+                                                <?php echo intval($propietario->idPersona) === intval($vte->idPersona) ? 'selected' : ''; ?>
+                                            >
+                                                <?php
+                                                echo htmlspecialchars(
+                                                    trim($propietario->nombre1Persona . ' ' . $propietario->apellido1Persona),
+                                                    ENT_QUOTES,
+                                                    'UTF-8'
+                                                );
+                                                ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="estadoBus">Estado</label>
+                                    <select name="estadoBus" id="estadoBus" class="form-control">
+                                        <option value="1" <?php echo intval($vte->estadoBus) === 1 ? 'selected' : ''; ?>>Activo</option>
+                                        <option value="0" <?php echo intval($vte->estadoBus) === 0 ? 'selected' : ''; ?>>Inactivo</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="validez">Validez</label>
+                                    <select name="validez" id="validez" class="form-control">
+                                        <option value="1" <?php echo intval($vte->validez) === 1 ? 'selected' : ''; ?>>Vigente</option>
+                                        <option value="0" <?php echo intval($vte->validez) === 0 ? 'selected' : ''; ?>>No vigente</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Actualizar Bus</button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger"
+                                        onclick="location.href='?c=buses&a=menuBuses'"
+                                    >
+                                        Volver
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="gps-box">
+                <div class="gps-box-header">
+                    <strong>Equipo GPS activo</strong>
+                    <span>Bus N.º <?php echo htmlspecialchars($vte->numeroBus, ENT_QUOTES, 'UTF-8'); ?></span>
+                </div>
+
+                <div class="card-body">
+                    <?php if ($gpsActivo): ?>
+                        <div class="gps-active-card">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div><strong>IMEI:</strong> <?php echo htmlspecialchars($gpsActivo->imei, ENT_QUOTES, 'UTF-8'); ?></div>
+                                    <div><strong>SIM:</strong> <?php echo htmlspecialchars($gpsActivo->simCard ?: 'Sin registrar', ENT_QUOTES, 'UTF-8'); ?></div>
+                                    <div><strong>Marca / Modelo:</strong> <?php echo htmlspecialchars(trim($gpsActivo->marca . ' ' . $gpsActivo->modelo), ENT_QUOTES, 'UTF-8'); ?></div>
+                                    <div><strong>Descripción:</strong> <?php echo htmlspecialchars($gpsActivo->descripcion ?: 'Sin descripción', ENT_QUOTES, 'UTF-8'); ?></div>
+                                    <div><strong>Instalado desde:</strong> <?php echo htmlspecialchars($gpsActivo->fechaInicio, ENT_QUOTES, 'UTF-8'); ?></div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <form action="?c=buses&a=RetirarGps" method="post" onsubmit="return confirm('¿Confirma retirar el GPS activo de este bus?');">
+                                        <input type="hidden" name="idBus" value="<?php echo $idBus; ?>">
+                                        <input type="hidden" name="idBusDispositivo" value="<?php echo intval($gpsActivo->idBusDispositivo); ?>">
+
+                                        <div class="form-group">
+                                            <label>Fecha y hora de retiro</label>
+                                            <input
+                                                type="datetime-local"
+                                                class="form-control"
+                                                name="fechaFin"
+                                                value="<?php echo date('Y-m-d\TH:i'); ?>"
+                                                required
+                                            >
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Motivo</label>
+                                            <select name="motivoCambio" class="form-control">
+                                                <option value="RETIRO">Retiro</option>
+                                                <option value="EQUIPO DAÑADO">Equipo dañado</option>
+                                                <option value="MANTENIMIENTO">Mantenimiento</option>
+                                                <option value="REEMPLAZO">Reemplazo</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Observación</label>
+                                            <textarea name="observacion" class="form-control" rows="2" maxlength="255"></textarea>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-warning">Retirar GPS</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="gps-none">
+                            Este bus no posee un GPS activo.
+                        </div>
+                    <?php endif; ?>
+
+                    <form action="?c=buses&a=AsignarGps" method="post" onsubmit="return confirmarAsignacionGps();">
+                        <input type="hidden" name="idBus" value="<?php echo $idBus; ?>">
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="imei">Seleccionar GPS</label>
+                                    <select name="imei" id="imei" class="form-control" required>
+                                        <option value="">Seleccione un equipo</option>
+
+                                        <?php foreach ($gpsDisponibles as $gps): ?>
+                                            <?php
+                                            $esActivoEsteBus = intval($gps->idBusActivo) === $idBus;
+                                            if ($esActivoEsteBus) {
+                                                continue;
+                                            }
+
+                                            $textoGps = $gps->imei;
+                                            if (!empty($gps->descripcion)) {
+                                                $textoGps .= ' - ' . $gps->descripcion;
+                                            }
+                                            if (!empty($gps->modelo)) {
+                                                $textoGps .= ' (' . $gps->modelo . ')';
+                                            }
+                                            ?>
+                                            <option value="<?php echo htmlspecialchars($gps->imei, ENT_QUOTES, 'UTF-8'); ?>">
+                                                <?php echo htmlspecialchars($textoGps, ENT_QUOTES, 'UTF-8'); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="fechaInicio">Fecha y hora de instalación</label>
+                                    <input
+                                        type="datetime-local"
+                                        class="form-control"
+                                        id="fechaInicio"
+                                        name="fechaInicio"
+                                        value="<?php echo date('Y-m-d\TH:i'); ?>"
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="motivoCambio">Motivo</label>
+                                    <select name="motivoCambio" id="motivoCambio" class="form-control">
+                                        <option value="INSTALACIÓN">Instalación</option>
+                                        <option value="REEMPLAZO DE EQUIPO">Reemplazo</option>
+                                        <option value="EQUIPO DAÑADO">Equipo dañado</option>
+                                        <option value="MANTENIMIENTO">Mantenimiento</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="observacion">Observación</label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="observacion"
+                                        name="observacion"
+                                        maxlength="255"
+                                        placeholder="Detalle de instalación o cambio"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">
+                            <?php echo $gpsActivo ? 'Reemplazar GPS activo' : 'Asignar GPS'; ?>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="gps-box">
+                <div class="gps-box-header">
+                    <strong>Historial de equipos GPS</strong>
+                    <span><?php echo count($historialGps); ?> asignaciones</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered gps-history-table" style="margin-bottom:0;">
+                        <thead class="bg-primary">
+                            <tr>
+                                <th>IMEI</th>
+                                <th>SIM</th>
+                                <th>Marca / Modelo</th>
+                                <th>Descripción</th>
+                                <th>Inicio</th>
+                                <th>Fin</th>
+                                <th>Motivo</th>
+                                <th>Observación</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (count($historialGps) > 0): ?>
+                                <?php foreach ($historialGps as $asignacion): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($asignacion->imei, ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?php echo htmlspecialchars($asignacion->simCard ?: '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?php echo htmlspecialchars(trim($asignacion->marca . ' ' . $asignacion->modelo), ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?php echo htmlspecialchars($asignacion->descripcion ?: '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?php echo htmlspecialchars($asignacion->fechaInicio, ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?php echo htmlspecialchars($asignacion->fechaFin ?: '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?php echo htmlspecialchars($asignacion->motivoCambio ?: '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td><?php echo htmlspecialchars($asignacion->observacion ?: '-', ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td>
+                                            <?php if ($asignacion->estado === 'ACTIVO'): ?>
+                                                <span class="status-active">ACTIVO</span>
+                                            <?php else: ?>
+                                                <span class="status-inactive">INACTIVO</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="9" style="text-align:center;">Este bus todavía no tiene historial de GPS.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-function subirimagen()
-{
-  self.name = 'opener';
-  remote = open('persona/vista/gestionimagen.php', 'remote', 'width=600,height=200,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes,fullscreen=yes, status=yes');
-  remote.focus();
-  }
+function confirmarAsignacionGps() {
+    const gpsActivo = <?php echo $gpsActivo ? 'true' : 'false'; ?>;
 
+    if (gpsActivo) {
+        return confirm(
+            'Este bus ya tiene un GPS activo. Al continuar, el equipo anterior quedará INACTIVO y se registrará el nuevo GPS. ¿Desea continuar?'
+        );
+    }
+
+    return confirm('¿Confirma asignar este GPS al bus?');
+}
 </script>
-
-
-  <?php include_once 'menu_principal/vista/Menu_Usuarios.php'; ?>   
-  <?php $cliente=$usuario->id_user;?>       
-
-  <?php if (isset($_GET["repetido"])) echo '<div class="alert alert-warning" role="alert">El Bus que intenta ingresar ya se encuentra registrado...</div>';?> 
-
-  <div class="container-fluid">
-
-
-    <div class="row">         
-      <div class="col-md-12">
-            <h2 align="center" class="titulos">Actualizar Bus</h2>
-            <div class="card card-primary">
-              <div class="card-header">
-                <h3 class="card-title">Datos del Bus</h3>
-              </div>
-              <!-- /.card-header -->
-              <!-- form start -->
-              <form id="form1" action="?c=buses&a=Guardar" name="form1" method="post" enctype="multipart/form-data">
-              <div class="col-md-6">
-                <div class="card-body">
-                  <div class="form-group">
-                    <input type="hidden" class="form-control" id="idBus" name="idBus" value="<?php echo $vte->idBus;?>">
-                    <label for="exampleInputEmail1">Numero de Bus</label>
-                   <input type="text" class="form-control" id="numeroBus" name="numeroBus" value="<?php echo $vte->numeroBus;?>" maxlength="10"onkeypress="return numeros(event)" placeholder="Ingresa el numero de bus">
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputPassword1">Placa Bus</label>
-                    <input type="text" class="form-control" id="placaBus" name="placaBus" value="<?php echo $vte->placaBus;?>" onkeypress="" placeholder="Ingresa la placa del bus">
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">Tipo de Bus</label>
-                                <select name="tipoBus" id="tipoBus" class="form-control  input-md" required>
-                            <option value="MICRO">Micro</option>
-                            <option value="VANS">VANS</option>          
-                      </select>
-                  </div>                  
-                  <input type="hidden" class="form-control" id="validez" name="validez" value="1"> 
-                  <input type="hidden" class="form-control" id="estadoBus" name="estadoBus" value="1"> 
-                  
-              
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="card-body">
-                  <div class="form-group">
-                    <label for="exampleInputPassword1">Propietario</label>
-                    <!--<input type="text" class="form-control" id="idPersona" name="idPersona" value="<?php echo $vte->idPersona;?>" placeholder="Selecciona el Propietario"> -->
-                 
-   <select name="idPersona" id="idPersona" class="form-control  input-md">
-            <?php
-            while ($row_propietario = $result_propietarios->fetch_assoc()) {
-                $selected = ($row_propietario['idPersona'] == $vte->idPersona) ? 'selected' : '';
-                echo "<option value='" . $row_propietario['idPersona'] . "' $selected>" . $row_propietario['nombre1Persona'] . "</option>";
-            }
-            ?>
-        </select>
- </div>
-
-                  <div class="form-group">
-                    <label for="exampleInputPassword1">Gps</label>
-            
-
-        <select name="idGps" id="idGps" class="form-control  input-md">
-            <?php
-            while ($row_gps = $result_gps->fetch_assoc()) {
-                $selected = ($row_gps['idGps'] == $vte->idGps) ? 'selected' : '';
-                echo "<option value='" . $row_gps['idGps'] . "' $selected>" . $row_gps['imeiGps'] . "</option>";
-            }
-            ?>
-        </select>
-                  </div>  
-
-                  <div class="form-group">             
-                    <button type="submit" class="btn btn-primary">Actualizar</button>
-                    <input type="button" id="cancelar" class="btn btn-danger" name="Cancelar" value="Cancelar" onClick="location.href='?c=menu_principal&a=menu_usuarios'">
-                  </div>                 
-                </div>
-              </div>              
-                <!-- /.card-body -->
-
-
-              </form>
-            </div>
-
-
-            </div>
-            
-        </div>
-   </div>    
-<br>
-   </div> 
- <script>
-    function numeros(e){
-    key = e.keyCode || e.which;
-    tecla = String.fromCharCode(key).toLowerCase();
-    letras = " 0123456789";
-    especiales = [9,13,8,37,39,46,38,46,164];
- 
-    tecla_especial = false
-    for(var i in especiales){
- if(key == especiales[i]){
-     tecla_especial = true;
-     break;
-        } 
-    }
- 
-    if(letras.indexOf(tecla)==-1 && !tecla_especial)
-        return false;
-}
-    </script>
-
-
-
-      <script>
-       
-       function sololetras(e){
-           key= e.keyCode || e.which;
-           teclado= String .fromCharCode(key).toLowerCase();
-           letras="abcdefghijklmnñopqrstuvwxyz"
-           especiales="13-9-8-37-38-46-164";
-           
-           teclado_especial=false;
-           
-           for(var i in especiales){
-               
-               if(key==especiales[i]){
-                   teclado_especial=true;break;
-                   
-                   }
-               }
-           if(letras.indexOf(teclado)==-1 && !teclado_especial){
-               
-               return false;
-               
-               }
-           
-           }
-       
-       
-       </script> 
-
- <script>
-       
-function checkRut(rut) {
-    // Despejar Puntos
-    var valor = rut.value.replace('.','');
-    // Despejar Guión
-    valor = valor.replace('-','');
-    
-    // Aislar Cuerpo y Dígito Verificador
-    cuerpo = valor.slice(0,-1);
-    dv = valor.slice(-1).toUpperCase();
-    
-    // Formatear RUN
-    rut.value = cuerpo + '-'+ dv
-    
-    // Si no cumple con el mínimo ej. (n.nnn.nnn)
-    if(cuerpo.length < 7) { rut.setCustomValidity("RUT Incompleto"); return false;}
-    
-    // Calcular Dígito Verificador
-    suma = 0;
-    multiplo = 2;
-    
-    // Para cada dígito del Cuerpo
-    for(i=1;i<=cuerpo.length;i++) {
-    
-        // Obtener su Producto con el Múltiplo Correspondiente
-        index = multiplo * valor.charAt(cuerpo.length - i);
-        
-        // Sumar al Contador General
-        suma = suma + index;
-        
-        // Consolidar Múltiplo dentro del rango [2,7]
-        if(multiplo < 7) { multiplo = multiplo + 1; } else { multiplo = 2; }
-  
-    }
-    
-    // Calcular Dígito Verificador en base al Módulo 11
-    dvEsperado = 11 - (suma % 11);
-    
-    // Casos Especiales (0 y K)
-    dv = (dv == 'K')?10:dv;
-    dv = (dv == 0)?11:dv;
-    
-    // Validar que el Cuerpo coincide con su Dígito Verificador
-    if(dvEsperado != dv) { rut.setCustomValidity("RUT Inválido"); return false; }
-    
-    // Si todo sale bien, eliminar errores (decretar que es válido)
-    rut.setCustomValidity('');
-}
-       
-       </script> 
