@@ -2,168 +2,171 @@
 class Gps
 {
 	private $pdo;
-    
-    public $idGps;
-    public $imeiGps;
-    public $simCardGps;
-    public $modelo;
 
+	public $idGps;
+	public $imei;
+	public $imeiGps;
+	public $simCard;
+	public $simCardGps;
+	public $marca;
+	public $modelo;
+	public $descripcion;
 
-
-
-  	public function __CONSTRUCT()
+	public function __CONSTRUCT()
 	{
-		try
-		{
-			$this->pdo = DatabaseLocal::ConectarLocal();     
-		}
-		catch(Exception $e)
-		{
+		try {
+			$this->pdo = DatabaseLocal::ConectarLocal();
+		} catch (Exception $e) {
 			die($e->getMessage());
 		}
 	}
+
 	public function ListarGps()
 	{
-		try
-		{
-			$result = array();
-
-			$stm = $this->pdo->prepare("SELECT * FROM gps ORDER BY idGps");
+		try {
+			$stm = $this->pdo->prepare("
+				SELECT 
+					imei AS idGps,
+					imei,
+					imei AS imeiGps,
+					simCard,
+					simCard AS simCardGps,
+					marca,
+					modelo,
+					descripcion
+				FROM dispositivos
+				ORDER BY imei ASC
+			");
 			$stm->execute();
 
 			return $stm->fetchAll(PDO::FETCH_OBJ);
-		}
-		catch(Exception $e)
-		{
+		} catch (Exception $e) {
 			die($e->getMessage());
 		}
 	}
 
 	public function Gps()
 	{
-		try
-		{
-			$result = array();
-
-			$stm = $this->pdo->prepare("SELECT count(*) AS cantidad FROM idGps");
+		try {
+			$stm = $this->pdo->prepare("
+				SELECT COUNT(*) AS cantidad 
+				FROM dispositivos
+			");
 			$stm->execute();
 
 			return $stm->fetchAll(PDO::FETCH_OBJ);
-		}
-		catch(Exception $e)
-		{
+		} catch (Exception $e) {
 			die($e->getMessage());
 		}
 	}
 
-
-	public function Obtener($idGps)
+	public function Obtener($imei)
 	{
-		try 
-		{
-	$stm = $this->pdo->prepare("SELECT * FROM gps
-        WHERE idGps = ?;");
-			          
-			$stm->execute(array($idGps));
-			return $stm->fetch(PDO::FETCH_OBJ);
+		try {
+			$stm = $this->pdo->prepare("
+				SELECT 
+					imei AS idGps,
+					imei,
+					imei AS imeiGps,
+					simCard,
+					simCard AS simCardGps,
+					marca,
+					modelo,
+					descripcion
+				FROM dispositivos
+				WHERE imei = ?
+				LIMIT 1
+			");
 
-		} catch (Exception $e) 
-		{
+			$stm->execute([$imei]);
+			return $stm->fetch(PDO::FETCH_OBJ);
+		} catch (Exception $e) {
 			die($e->getMessage());
 		}
 	}
 
-		public function ObtenerNumeroGps($imeiGps)
+	public function ObtenerNumeroGps($imei)
 	{
-		try 
-		{
-	$stm = $this->pdo->prepare("SELECT * FROM gps
-        WHERE imeiGps = ?;");
-			          
-			$stm->execute(array($imeiGps));
-			return $stm->fetch(PDO::FETCH_OBJ);
+		try {
+			$stm = $this->pdo->prepare("
+				SELECT *
+				FROM dispositivos
+				WHERE imei = ?
+				LIMIT 1
+			");
 
-		} catch (Exception $e) 
-		{
+			$stm->execute([$imei]);
+			return $stm->fetch(PDO::FETCH_OBJ);
+		} catch (Exception $e) {
 			die($e->getMessage());
 		}
 	}
-
 
 	public function Registrar(Gps $data)
 	{
-		try 
-		{
+		try {
+			$sql = "
+				INSERT INTO dispositivos 
+				(
+					imei,
+					simCard,
+					marca,
+					modelo,
+					descripcion
+				)
+				VALUES (?, ?, ?, ?, ?)
+			";
 
-
-		$sql = "INSERT INTO gps (idGps,imeiGps, simCardGps, modelo) 
-		        VALUES (?,?,?,?)";	 	
-
-		$this->pdo->prepare($sql)
-		     ->execute(
-				array(
-				   $data->idGps = NULL,
-				   $data->imeiGps,	
-				   $data->simCardGps,
-				   $data->modelo
-                )
-			);		
-
-		} catch (Exception $e) 
-		{
+			$this->pdo->prepare($sql)->execute([
+				$data->imei,
+				$data->simCard,
+				$data->marca,
+				$data->modelo,
+				$data->descripcion
+			]);
+		} catch (Exception $e) {
 			die($e->getMessage());
 		}
-		
 	}
 
-
-
-public function ActualizarGps($data)
+	public function ActualizarGps($data)
 	{
-		try 
-		{
-			$sql = "UPDATE gps SET 
-					  imeiGps = ?,
-				    simCardGps = ?,
-				    modelo = ?
+		try {
+			$sql = "
+				UPDATE dispositivos SET
+					imei = ?,
+					simCard = ?,
+					marca = ?,
+					modelo = ?,
+					descripcion = ?
+				WHERE imei = ?
+			";
 
-			       WHERE idGps = ?";
-
-
-			$this->pdo->prepare($sql)
-			     ->execute(
-				    array(
-                   $data->imeiGps,
-                   $data->simCardGps,
-                   $data->modelo,              
-                   $data->idGps
-                 
-
-
-					)
-				);
-		} catch (Exception $e) 
-		{
+			$this->pdo->prepare($sql)->execute([
+				$data->imei,
+				$data->simCard,
+				$data->marca,
+				$data->modelo,
+				$data->descripcion,
+				$data->idGps
+			]);
+		} catch (Exception $e) {
 			die($e->getMessage());
 		}
 	}
 
-
-	public function Eliminar($idGps)
+	public function Eliminar($imei)
 	{
-		try 
-		{
-			$stm = $this->pdo->prepare("DELETE FROM gps WHERE idGps = ?");			          
+		try {
+			$stm = $this->pdo->prepare("
+				DELETE FROM dispositivos 
+				WHERE imei = ?
+			");
 
-			$stm->execute(array($idGps));
-		} catch (Exception $e) 
-		{
+			$stm->execute([$imei]);
+		} catch (Exception $e) {
 			die($e->getMessage());
 		}
 	}
-
 }
-
-
-
 ?>
