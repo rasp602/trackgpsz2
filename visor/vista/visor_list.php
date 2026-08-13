@@ -11,13 +11,13 @@
                 $usuario = $_SESSION["usuarioInventario"];
                     if ($usuario->nivel == "U") 
                         {
-                                echo "hola usuario";
+                         
                                  include_once 'menu_principal/vista/Menu_sincantidades.php'; 
                         }  
 
                    if ($usuario->nivel == "F") 
                         {
-                                echo "hola Fiscalizador";
+                              
                                 include_once 'menu_principal/vista/Menu_Fiscalizador.php';   
                         } 
                }               
