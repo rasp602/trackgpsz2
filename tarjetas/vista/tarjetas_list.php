@@ -38,8 +38,6 @@
      <div class="container mt-5">
 
 
-
-
    <div class="row">
         <div class="col-md-1"></div>
     	<div class="col-md-10">
@@ -51,7 +49,7 @@
     frameborder="0">
 </iframe>
     	</div>
- <div class="col-md-1"></div>
+    <div class="col-md-1"></div>
         <div id="result"></div>
     </div>
 <?php /*include_once 'tarjetas/vista/tarjetas.php';*/ ?>
