@@ -36,61 +36,9 @@
 
 
      <div class="container mt-5">
-<h1>Tarjetas</h1>
-
-<div class="col-md-2">
-<h4>Conductor</h4>
-            <select name="idBus" id="idBus" class="form-control input-sm" required>
-                <option value="">Seleccionar Bus</option>
-                <?php foreach ($this->model->ListarBuses() as $a): ?>
-                    <option value="<?php echo $a->idBus; ?>" <?php echo $a->idBus == "" ? 'selected' : ''; ?>>
-                        <?php echo $a->placaBus; ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-    </div>
-    <div class="col-md-2">
-    <h4>Conductor</h4>
-            <select name="idPersona" id="idPersona" class="form-control input-sm" required>
-                <option value="">Seleccionar Conductor</option>
-                <?php foreach ($this->model->ListarConductor() as $a): ?>
-                    <option value="<?php echo $a->idPersona; ?>" <?php echo $a->idPersona == "" ? 'selected' : ''; ?>>
-                        <?php echo $a->nombre1Persona . " " . $a->apellido1Persona; ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
 
 
-        <div class="col-md-2">
-        <h4>Variante</h4>
-            <select name="idVariante" id="idVariante" class="form-control input-sm" required>
-                <option value="">Seleccionar Variante</option>
-                <?php foreach ($this->model->ListarVariante() as $a): ?>
-                    <option value="<?php echo $a->idVariante; ?>" <?php echo $a->idVariante == "" ? 'selected' : ''; ?>>
-                        <?php echo $a->nombreVariante; ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        </div>
 
-        <div class="col-md-2">
-            <h4>Desde</h4>
-          <div class="input-group"> 
-               <input class="form-control input-sm" id="desde" name="desde"  type="date" value=""  autocomplete="off" required/>
-
-           </div>
-        </div>  
-        
-        <div class="col-md-2">
-            <h4>Hasta</h4>
-          <div class="input-group">
-               <input class="form-control input-sm" id="hasta" name="hasta"  type="date" value=""  autocomplete="off" required/>
-          </div>
-        </div>
-
-
-</div>
 
    <div class="row">
         <div class="col-md-1"></div>
