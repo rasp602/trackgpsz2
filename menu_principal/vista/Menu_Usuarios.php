@@ -9,11 +9,162 @@ if (!isset($_SESSION['usuarioInventario']))
 }
 ?>
 
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<style>
+  :root {
+    --executive-navy: #0b1f3a;
+    --executive-blue: #175cd3;
+    --executive-cyan: #0ea5e9;
+    --executive-bg: #f3f6fa;
+    --executive-text: #172033;
+    --executive-muted: #667085;
+    --executive-border: #e4e9f0;
+    --executive-radius: 16px;
+    --executive-shadow: 0 10px 30px rgba(15, 35, 64, .08);
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--executive-bg);
+    color: var(--executive-text);
+    font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+
+  .main-header {
+    min-height: 64px;
+    padding: 0 22px;
+    border: 0;
+    border-bottom: 1px solid var(--executive-border);
+    box-shadow: 0 2px 14px rgba(15, 35, 64, .05);
+    position: relative;
+    z-index: 1040;
+  }
+  .main-header .nav-link {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #344054 !important;
+    font-weight: 600;
+    border-radius: 10px;
+    margin: 10px 3px;
+    transition: background .2s ease, color .2s ease;
+  }
+  .main-header .nav-link:hover { background: #eff6ff; color: var(--executive-blue) !important; }
+
+  .main-sidebar { background: linear-gradient(180deg, #0b1f3a 0%, #07162a 100%) !important; }
+  .brand-link {
+    min-height: 92px;
+    display: grid !important;
+    grid-template-columns: 48px 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+    align-content: center;
+    padding: 15px 16px !important;
+    border-bottom: 1px solid rgba(255,255,255,.09) !important;
+    white-space: normal;
+  }
+  .brand-link .brand-image {
+    grid-row: 1 / 3;
+    width: 46px !important;
+    height: 46px !important;
+    max-height: 46px;
+    margin: 0 !important;
+    object-fit: contain;
+    background: #fff;
+    padding: 4px;
+  }
+  .brand-link span { color: #fff; font-size: 16px; font-weight: 700 !important; letter-spacing: .4px; }
+  .brand-link p { color: #9fb2cc; font-size: 11px; line-height: 1.25; margin: 2px 0 0; }
+  .sidebar { padding: 0 10px 24px; }
+  .user-panel { align-items: center; padding: 15px 8px !important; }
+  .user-panel .image { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: rgba(255,255,255,.1); }
+  .user-panel .image svg { width: 24px; height: 24px; }
+  .user-panel .info h4 { margin: 0; font-size: 14px; line-height: 1.35; font-weight: 600; }
+  .nav-sidebar .nav-link { min-height: 46px; display: flex; align-items: center; border-radius: 10px; margin-bottom: 4px; }
+  .nav-sidebar .nav-link.active { background: linear-gradient(135deg, var(--executive-blue), var(--executive-cyan)) !important; box-shadow: 0 8px 20px rgba(14,165,233,.22); }
+  .nav-sidebar .nav-icon, .nav-treeview .nav-link > i:first-child { width: 28px !important; margin-right: 8px !important; font-size: 17px !important; text-align: center; }
+  .nav-sidebar p { font-size: 13px; font-weight: 500; }
+
+  .content-wrapper { background: var(--executive-bg); min-height: calc(100vh - 64px); }
+  .content-header { padding: 22px 24px 10px; }
+  .dashboard-heading { margin: 0; font-size: clamp(22px, 3vw, 30px); font-weight: 750; letter-spacing: -.5px; }
+  .dashboard-subtitle { margin: 5px 0 0; color: var(--executive-muted); font-size: 14px; }
+  #barraUsuarioFecha {
+    display: inline-flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 9px 14px;
+    color: #475467;
+    background: #fff;
+    border: 1px solid var(--executive-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(15,35,64,.04);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .content { padding: 8px 24px 28px !important; }
+  .dashboard-grid { margin-left: -8px; margin-right: -8px; }
+  .dashboard-grid > [class*="col-"] { padding-left: 8px; padding-right: 8px; }
+  .executive-card {
+    min-height: 185px;
+    overflow: hidden;
+    background: #fff !important;
+    color: var(--executive-text) !important;
+    border: 1px solid var(--executive-border);
+    border-radius: var(--executive-radius);
+    box-shadow: var(--executive-shadow);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .executive-card:hover { transform: translateY(-3px); box-shadow: 0 15px 36px rgba(15,35,64,.12); }
+  .executive-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--accent); }
+  .executive-card .inner { min-height: 136px; padding: 24px 22px; position: relative; z-index: 2; }
+  .executive-card h3 { min-height: 36px; margin: 0 0 10px; color: var(--executive-text); font-size: 30px; font-weight: 750; }
+  .executive-card h4 { margin: 0; color: #475467; font-size: 15px; font-weight: 650; }
+  .executive-card .icon { top: 20px; right: 18px; }
+  .executive-card .icon > i { color: var(--accent) !important; opacity: .14; font-size: 68px !important; }
+  .executive-card .small-box-footer {
+    min-height: 49px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 18px;
+    background: color-mix(in srgb, var(--accent) 8%, white) !important;
+    color: var(--accent) !important;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .card-people { --accent: #d97706; }
+  .card-buses { --accent: #0284c7; }
+  .card-users { --accent: #dc2626; }
+  .card-controls { --accent: #059669; }
+
+  @media (max-width: 767.98px) {
+    .main-header { min-height: 58px; padding: 0 8px; }
+    .main-header .nav-link { margin: 7px 1px; padding: 8px 10px; }
+    .main-header .menu-label { display: none; }
+    .content-header { padding: 18px 14px 8px; }
+    .content-header .row > div { flex: 0 0 100%; max-width: 100%; }
+    .content-header .breadcrumb { float: none !important; margin: 12px 0 0; padding: 0; }
+    #barraUsuarioFecha { width: 100%; justify-content: center; text-align: center; }
+    .content { padding: 8px 14px 24px !important; }
+    .executive-card { min-height: 164px; margin-bottom: 14px; }
+    .executive-card .inner { min-height: 116px; padding: 20px 18px; }
+    .executive-card .icon > i { font-size: 58px !important; }
+    .executive-card:hover { transform: none; }
+  }
+  @media (max-width: 420px) {
+    .dashboard-grid > [class*="col-"] { flex: 0 0 100%; max-width: 100%; }
+    .dashboard-heading { font-size: 23px; }
+  }
+</style>
+
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
 
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i> Menú</a>
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button" aria-label="Abrir menú"><i class="fas fa-bars"></i> <span class="menu-label">Menú</span></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
         <a href="?c=menu_principal&a=menu_usuarios" class="nav-link">Inicio</a>
@@ -46,7 +197,6 @@ if (!isset($_SESSION['usuarioInventario']))
       <span class="brand-text font-weight-light">CONTROL FLOTA</span>
       <p class="brand-text font-weight-light">Servicio de geolocalización</p>
     </a>
-<br>
     <!-- Sidebar -->
     <div class="sidebar">
       <!-- Sidebar user panel (optional) -->
@@ -281,7 +431,8 @@ if (!isset($_SESSION['usuarioInventario']))
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-          
+            <h1 class="dashboard-heading">Panel de control</h1>
+            <p class="dashboard-subtitle">Resumen general de la operación de flota</p>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -319,13 +470,13 @@ if (!isset($_SESSION['usuarioInventario']))
     <section class="content">
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
-        <div class="row">
+        <div class="row dashboard-grid">
 
           <!-- ./col -->
 
           <div class="col-lg-3 col-6">
             <!-- small box -->
-            <div class="small-box bg-warning">
+            <div class="small-box executive-card card-people">
               <div class="inner">
                 <h3 class="cantidad"></h3>
 
@@ -341,7 +492,7 @@ if (!isset($_SESSION['usuarioInventario']))
 
           <div class="col-lg-3 col-6">
             <!-- small box -->
-            <div class="small-box bg-info">
+            <div class="small-box executive-card card-buses">
               <div class="inner">
                 <h3 class="hospedaje"></h3>
 
@@ -360,7 +511,7 @@ if (!isset($_SESSION['usuarioInventario']))
 
           <div class="col-lg-3 col-6">
             <!-- small box -->
-            <div class="small-box bg-danger">
+            <div class="small-box executive-card card-users">
               <div class="inner">
                 <h3 class="comidas"></h3>
               <div class="icon">
@@ -375,7 +526,7 @@ if (!isset($_SESSION['usuarioInventario']))
 
           <div class="col-lg-3 col-6">
             <!-- small box -->
-            <div class="small-box bg-success">
+            <div class="small-box executive-card card-controls">
               <div class="inner">
                 <h3 class="trabajadores"></h3>
 
