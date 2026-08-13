@@ -35,7 +35,7 @@
      <?php if (isset($_GET["update"])) echo '<div class="alert alert-warning" role="alert">Hotel actulizado correctamente..</div>'; ?>
 
 
-     <div class="container mt-5">
+   
 
 
    <div class="row">
@@ -53,7 +53,7 @@
         <div id="result"></div>
     </div>
 <?php /*include_once 'tarjetas/vista/tarjetas.php';*/ ?>
-</div>
+
 
 
 
