@@ -95,7 +95,13 @@
    <div class="row">
         <div class="col-md-1"></div>
     	<div class="col-md-10">
-    		<div class="outer_div"></div>
+
+    	  <iframe
+    src="https://trackgpsz1.com/gps/tarjetas-operacionales"
+    width="100%"
+    height="900"
+    frameborder="0">
+</iframe>
     	</div>
  <div class="col-md-1"></div>
         <div id="result"></div>
