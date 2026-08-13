@@ -12,7 +12,7 @@
                     if ($usuario->nivel == "U") 
                         {
                                 echo "hola usuario";
-                                 include_once 'menu_principal/vista/Menu_Usuarios.php'; 
+                                 include_once 'menu_principal/vista/Menu_sincantidades.php'; 
                         }  
 
                    if ($usuario->nivel == "F") 
