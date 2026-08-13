@@ -40,12 +40,12 @@
     </div>
 
    <div class="row">
-  
-    	<div class="col-md-12"><h6>Visor de Online</h6>
-    		<div class="outer_div"></div>
-            <iframe src="/gps" width="100%" height="900px" frameborder="0"></iframe>
-    	</div>
-
+  <iframe
+    src="https://trackgpsz1.com/gps/"
+    width="100%"
+    height="900"
+    frameborder="0">
+</iframe>
 
 </div>
 
