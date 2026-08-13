@@ -157,19 +157,61 @@ if (!isset($_SESSION['usuarioInventario']))
     }
     .main-header .navbar-nav { height: 50px; align-items: center; }
     .main-header .nav-link {
-      width: 42px;
+      width: auto;
       min-height: 42px;
       margin: 4px 0;
-      padding: 0;
+      padding: 0 13px;
       justify-content: center;
+      gap: 8px;
       color: #fff !important;
-      font-size: 19px;
+      font-size: 14px;
+      font-weight: 700;
       background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
     }
+    .main-header .nav-link i { font-size: 18px; }
     .main-header .nav-link:hover,
     .main-header .nav-link:focus { background: rgba(255,255,255,.16); color: #fff !important; }
-    .main-header .menu-label { display: none; }
+    .main-header .menu-label { display: inline; }
     .main-header .nav-item.d-none { display: none !important; }
+    .mobile-navbar-brand {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #fff;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .mobile-navbar-brand strong {
+      font-size: 14px;
+      line-height: 1.1;
+      font-weight: 750;
+      letter-spacing: .2px;
+    }
+    .mobile-navbar-brand small {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 3px;
+      color: #b9d6ff;
+      font-size: 9px;
+      font-weight: 650;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+    }
+    .mobile-navbar-brand small::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(52,211,153,.15);
+    }
     .content-header { padding: 18px 14px 8px; }
     .content-header .row > div { flex: 0 0 100%; max-width: 100%; }
     .content-header .breadcrumb { float: none !important; margin: 12px 0 0; padding: 0; }
@@ -199,6 +241,11 @@ if (!isset($_SESSION['usuarioInventario']))
         <a href="#" class="nav-link">Contactos</a>
       </li>
     </ul>
+
+    <div class="mobile-navbar-brand d-md-none" aria-hidden="true">
+      <strong>Control de Flota</strong>
+      <small>GPS Online</small>
+    </div>
 
     <!-- Right navbar links -->
 
@@ -453,11 +500,131 @@ if (!isset($_SESSION['usuarioInventario']))
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="dashboard-heading">Panel de control</h1>
+            <p class="dashboard-subtitle">Resumen general de la operación de flota</p>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+            
+               <div  id="barraUsuarioFecha" align="right">  
+                                <script type="text/javascript">
+                                    var d = new Date();
+                                    var dayname = new Array("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado");
+                                    var monthname = new Array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
 
+                                    document.write(dayname[d.getDay()]);
+                                    document.write(', ');
+                                    document.write(d.getDate());
+                                    document.write(' de ');
+                                    document.write(monthname[d.getMonth()]);
+                                    document.write(' de ');
+                                    document.write(d.getFullYear());
+                                </script>
+                                  <?php
+                     date_default_timezone_set("America/Santiago"); 
+                    echo date("H:i:s");?>
+
+
+                    
+                              </div>
+            
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
     <!-- /.content-header -->
 
     <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row dashboard-grid">
 
+          <!-- ./col -->
+
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box executive-card card-people">
+              <div class="inner">
+                <h3 class="cantidad"></h3>
+
+                <h4>Personas registradas</h4>
+              </div>
+              <div class="icon">
+                <i class="ion ion-person-add"></i>
+              </div>
+              <a href="?c=persona&a=Crud" class="small-box-footer">Registrar Persona <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box executive-card card-buses">
+              <div class="inner">
+                <h3 class="hospedaje"></h3>
+
+                <h4>Buses</h4>
+              </div>
+                      <div class="icon">
+                <i class="ion  ion-android-bus"></i>
+              </div>
+          
+              
+            <a href="?c=hospedaje&a=Crud" class="small-box-footer">Registrar Bus <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+    
+          <!-- ./col -->
+
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box executive-card card-users">
+              <div class="inner">
+                <h3 class="comidas"></h3>
+              <div class="icon">
+                <i class="ion ion-ios-contact"></i>
+              </div>
+                <h4>Usuarios</h4>
+              </div>
+
+              <a href="?c=comida&a=Crud1" class="small-box-footer">Registrar usuario <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box executive-card card-controls">
+              <div class="inner">
+                <h3 class="trabajadores"></h3>
+
+                <h4>Controles</h4>
+              </div>
+              <div class="icon">
+                <i class="ion ion-android-time"></i>
+              </div>
+              <a href="?c=trabajador&a=Crud" class="small-box-footer">Registrar Trabajador <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+
+
+
+
+
+
+          <!-- ./col -->
+        </div>
+        <!-- /.row -->
+        <!-- Main row -->
+ 
+        <!-- /.row (main row) -->
+      </div><!-- /.container-fluid -->
+    </section>
     <!-- /.content -->
 
   <!-- /.content-wrapper -->
