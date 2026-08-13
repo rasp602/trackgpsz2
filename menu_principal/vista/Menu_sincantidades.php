@@ -498,20 +498,7 @@ if (!isset($_SESSION['usuarioInventario']))
 
  <!-- /.HASTA AQUI MENU DE LA IZQUIERDA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
 
-    <!-- /.content-header -->
-
-    <!-- Main content -->
-
-    
-
-
-
-
-          <!-- ./col -->
-        </div>
         <!-- /.row -->
         <!-- Main row -->
  
