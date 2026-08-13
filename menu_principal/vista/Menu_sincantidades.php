@@ -140,10 +140,36 @@ if (!isset($_SESSION['usuarioInventario']))
   .card-users { --accent: #dc2626; }
   .card-controls { --accent: #059669; }
 
+  /* En computadores se oculta completamente la barra superior. */
+  @media (min-width: 768px) {
+    .main-header { display: none !important; }
+  }
+
   @media (max-width: 767.98px) {
-    .main-header { min-height: 58px; padding: 0 8px; }
-    .main-header .nav-link { margin: 7px 1px; padding: 8px 10px; }
+    /* En móviles se conserva una barra compacta para abrir el menú lateral. */
+    .main-header {
+      min-height: 50px;
+      height: 50px;
+      padding: 0 8px;
+      background: linear-gradient(135deg, var(--executive-navy), #123a70) !important;
+      border: 0;
+      box-shadow: 0 5px 16px rgba(11,31,58,.18);
+    }
+    .main-header .navbar-nav { height: 50px; align-items: center; }
+    .main-header .nav-link {
+      width: 42px;
+      min-height: 42px;
+      margin: 4px 0;
+      padding: 0;
+      justify-content: center;
+      color: #fff !important;
+      font-size: 19px;
+      background: rgba(255,255,255,.08);
+    }
+    .main-header .nav-link:hover,
+    .main-header .nav-link:focus { background: rgba(255,255,255,.16); color: #fff !important; }
     .main-header .menu-label { display: none; }
+    .main-header .nav-item.d-none { display: none !important; }
     .content-header { padding: 18px 14px 8px; }
     .content-header .row > div { flex: 0 0 100%; max-width: 100%; }
     .content-header .breadcrumb { float: none !important; margin: 12px 0 0; padding: 0; }
@@ -427,11 +453,131 @@ if (!isset($_SESSION['usuarioInventario']))
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="dashboard-heading">Panel de control</h1>
+            <p class="dashboard-subtitle">Resumen general de la operación de flota</p>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+            
+               <div  id="barraUsuarioFecha" align="right">  
+                                <script type="text/javascript">
+                                    var d = new Date();
+                                    var dayname = new Array("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado");
+                                    var monthname = new Array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
 
+                                    document.write(dayname[d.getDay()]);
+                                    document.write(', ');
+                                    document.write(d.getDate());
+                                    document.write(' de ');
+                                    document.write(monthname[d.getMonth()]);
+                                    document.write(' de ');
+                                    document.write(d.getFullYear());
+                                </script>
+                                  <?php
+                     date_default_timezone_set("America/Santiago"); 
+                    echo date("H:i:s");?>
+
+
+                    
+                              </div>
+            
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
     <!-- /.content-header -->
 
     <!-- Main content -->
-   
+    <section class="content">
+      <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row dashboard-grid">
+
+          <!-- ./col -->
+
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box executive-card card-people">
+              <div class="inner">
+                <h3 class="cantidad"></h3>
+
+                <h4>Personas registradas</h4>
+              </div>
+              <div class="icon">
+                <i class="ion ion-person-add"></i>
+              </div>
+              <a href="?c=persona&a=Crud" class="small-box-footer">Registrar Persona <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <!-- ./col -->
+
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box executive-card card-buses">
+              <div class="inner">
+                <h3 class="hospedaje"></h3>
+
+                <h4>Buses</h4>
+              </div>
+                      <div class="icon">
+                <i class="ion  ion-android-bus"></i>
+              </div>
+          
+              
+            <a href="?c=hospedaje&a=Crud" class="small-box-footer">Registrar Bus <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+    
+          <!-- ./col -->
+
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box executive-card card-users">
+              <div class="inner">
+                <h3 class="comidas"></h3>
+              <div class="icon">
+                <i class="ion ion-ios-contact"></i>
+              </div>
+                <h4>Usuarios</h4>
+              </div>
+
+              <a href="?c=comida&a=Crud1" class="small-box-footer">Registrar usuario <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box executive-card card-controls">
+              <div class="inner">
+                <h3 class="trabajadores"></h3>
+
+                <h4>Controles</h4>
+              </div>
+              <div class="icon">
+                <i class="ion ion-android-time"></i>
+              </div>
+              <a href="?c=trabajador&a=Crud" class="small-box-footer">Registrar Trabajador <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+
+
+
+
+
+
+          <!-- ./col -->
+        </div>
+        <!-- /.row -->
+        <!-- Main row -->
+ 
+        <!-- /.row (main row) -->
+      </div><!-- /.container-fluid -->
+    </section>
     <!-- /.content -->
 
   <!-- /.content-wrapper -->
