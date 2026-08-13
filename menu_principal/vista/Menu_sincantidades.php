@@ -493,20 +493,7 @@ if (!isset($_SESSION['usuarioInventario']))
     <!-- /.content-header -->
 
     <!-- Main content -->
-    <section class="content">
 
-
-
-
-
-          <!-- ./col -->
-        </div>
-        <!-- /.row -->
-        <!-- Main row -->
- 
-        <!-- /.row (main row) -->
-      </div><!-- /.container-fluid -->
-    </section>
     <!-- /.content -->
 
   <!-- /.content-wrapper -->
