@@ -13,7 +13,7 @@ class VisorController{
 
         public function menuVisor(){
         require_once 'includes/header_visor.php';
-        require_once '/gps';
+        require_once 'visor/vista/visor_list.php';
         require_once 'includes/footer.php';
     }
 
