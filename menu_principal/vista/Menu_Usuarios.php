@@ -130,7 +130,7 @@ if (!isset($_SESSION['usuarioInventario']))
                 </a>
               </li>  
               <li class="nav-item">
-                <a href="?c=visor&a=menuVisor" class="nav-link">
+                <a href="/gps/" class="nav-link">
                 <i class='fas fa-map-marked-alt' style='font-size:24px'></i>
                   <p>Visor online</p>
                 </a>
