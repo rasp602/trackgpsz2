@@ -427,43 +427,7 @@ if (!isset($_SESSION['usuarioInventario']))
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="dashboard-heading">Panel de control</h1>
-            <p class="dashboard-subtitle">Resumen general de la operación de flota</p>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-            
-               <div  id="barraUsuarioFecha" align="right">  
-                                <script type="text/javascript">
-                                    var d = new Date();
-                                    var dayname = new Array("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado");
-                                    var monthname = new Array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
 
-                                    document.write(dayname[d.getDay()]);
-                                    document.write(', ');
-                                    document.write(d.getDate());
-                                    document.write(' de ');
-                                    document.write(monthname[d.getMonth()]);
-                                    document.write(' de ');
-                                    document.write(d.getFullYear());
-                                </script>
-                                  <?php
-                     date_default_timezone_set("America/Santiago"); 
-                    echo date("H:i:s");?>
-
-
-                    
-                              </div>
-            
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </div>
     <!-- /.content-header -->
 
     <!-- Main content -->
